@@ -1,0 +1,10 @@
+{
+    "required": true,
+    "package": "net.soko.pyrotechnics.mixins",
+    "compatibilityLevel": "JAVA_17",
+    "refmap": "pyrotechnics.refmap.json",
+    "mixins": [
+        "GhastMixin"
+    ],
+    "minVersion": "0.8.5"
+}

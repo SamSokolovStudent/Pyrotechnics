@@ -1,0 +1,11 @@
+{
+	"variants": {
+		"empty=false": {
+			"model": "pyrotechnics:block/fireworks_box"
+		},
+
+		"empty=true": {
+			"model": "pyrotechnics:block/fireworks_box_empty"
+		}
+	}
+}

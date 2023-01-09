@@ -1,0 +1,37 @@
+{
+    "type": "minecraft:block",
+    "pools": [
+        {
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "item",
+                    "conditions": [
+                        {
+                            "condition": "block_state_property",
+                            "block": "pyrotechnics:fireworks_box",
+                            "properties": {
+                                "triggered": "false",
+                                "empty": "false"
+                            }
+                        }
+                    ],
+                    "functions": [
+                        {
+                            "function": "copy_nbt",
+                            "ops": [
+                                {
+                                    "op": "replace",
+                                    "source": "Fireworks",
+                                    "target": "BlockEntityTag.Fireworks"
+                                }
+                            ],
+                            "source": "block_entity"
+                        }
+                    ],
+                    "name": "pyrotechnics:fireworks_box"
+                }
+            ]
+        }
+    ]
+}

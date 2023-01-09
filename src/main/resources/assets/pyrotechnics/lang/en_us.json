@@ -1,5 +1,11 @@
 {
   "item.pyrotechnics.fireworks_box": "Fireworks Box",
+  "item.pyrotechnics.large_fire_charge": "Large Fire Charge",
   "itemGroup.pyrotechnics": "Pyrotechnics",
-  "block.pyrotechnics.fireworks_box": "Fireworks Box"
+  "block.pyrotechnics.fireworks_box": "Fireworks Box",
+  "death.attack.firework": "%1$s's end was a sight to behold",
+  "death.attack.firework.player": "%1$s was turned into a pyrotechnic display by %2$s",
+  "death.attack.firework.player.item": "%1$s was turned into a pyrotechnic display by %2$s's %3$s",
+  "advancements.nether.out_for_delivery.title": "Out for Delivery",
+  "advancements.nether.out_for_delivery.description": "Kill a Ghast with your own Large Fire Charge"
 }

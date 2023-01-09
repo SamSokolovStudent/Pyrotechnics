@@ -20,6 +20,8 @@ public class ModCreativeModeTab {
     public static void buildContents(CreativeModeTabEvent.BuildContents event) {
         if (event.getTab() == PYROTECHNICS) {
             event.accept(ModItems.FIREWORKS_BOX.get());
+            event.accept(ModItems.LARGE_FIRE_CHARGE.get());
+            event.accept(ModItems.GUNPOWDER_FUSE.get());
         }
     }
 }

@@ -1,0 +1,48 @@
+{
+    "display": {
+        "icon": {
+            "item": "pyrotechnics:large_fire_charge"
+        },
+        "title": {
+            "translate": "advancements.nether.out_for_delivery.title"
+        },
+        "description": {
+            "translate": "advancements.nether.out_for_delivery.description"
+        },
+        "frame": "challenge",
+        "show_toast": true,
+        "announce_to_chat": true,
+        "hidden": false
+    },
+    "parent": "minecraft:nether/return_to_sender",
+    "criteria": {
+        "killed_ghast": {
+            "trigger": "minecraft:player_killed_entity",
+            "conditions": {
+                "entity": [
+                    {
+                        "condition": "minecraft:entity_properties",
+                        "entity": "this",
+                        "predicate": {
+                            "type": "minecraft:ghast"
+                        }
+                    }
+                ],
+                "killing_blow": {
+                    "is_projectile": true,
+                    "direct_entity": {
+                        "type": "pyrotechnics:large_fire_charge"
+                    }
+                }
+            }
+        }
+    },
+    "requirements": [
+        [
+            "killed_ghast"
+        ]
+    ],
+    "rewards": {
+        "experience": 50
+    }
+}
