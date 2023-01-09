@@ -4,8 +4,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -20,6 +25,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.RedstoneSide;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -57,8 +64,62 @@ public class GunpowderFuseBlock extends Block {
 
     @Override
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
+        // Check if block is ignited, if so then set neighboring blocks that are unignited to ignited and schedule current block to be set to burnt
+        if (pState.getValue(FUSE_STATE) == FuseState.IGNITED) {
+            for (Direction direction : Direction.Plane.HORIZONTAL) {
+                BlockPos blockpos = pState.getValue(PROPERTY_BY_DIRECTION.get(direction)) == RedstoneSide.UP ? pPos.relative(direction).above() : pPos.relative(direction);
+                if (!pLevel.getBlockState(blockpos).is(this)) {
+                    blockpos = blockpos.below();
+                }
+                BlockState blockstate = pLevel.getBlockState(blockpos);
+                if (blockstate.is(this) && blockstate.getValue(FUSE_STATE) == FuseState.UNIGNITED) {
+                    pLevel.setBlockAndUpdate(blockpos, blockstate.setValue(FUSE_STATE, FuseState.IGNITED));
+                    pLevel.scheduleTick(blockpos, this, 5);
+                }
+            }
+        }
+    }
 
-        super.tick(pState, pLevel, pPos, pRandom);
+    @Override
+    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+        if (pState.getValue(FUSE_STATE) == FuseState.UNIGNITED) {
+            pLevel.setBlockAndUpdate(pPos, pState.setValue(FUSE_STATE, FuseState.IGNITED));
+            pLevel.scheduleTick(pPos, this, 1);
+            return InteractionResult.SUCCESS;
+        }
+        return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+    }
+
+    private void spawnParticlesAlongLine(Level pLevel, RandomSource pRandom, BlockPos pPos, Vec3 pParticleVec, Direction pXDirection, Direction pZDirection, float pMin, float pMax) {
+        float f = pMax - pMin;
+        if (!(pRandom.nextFloat() >= 0.2F * f)) {
+            float f1 = 0.4375F;
+            float f2 = pMin + f * pRandom.nextFloat();
+            double d0 = 0.5D + (double)(0.4375F * (float)pXDirection.getStepX()) + (double)(f2 * (float)pZDirection.getStepX());
+            double d1 = 0.5D + (double)(0.4375F * (float)pXDirection.getStepY()) + (double)(f2 * (float)pZDirection.getStepY());
+            double d2 = 0.5D + (double)(0.4375F * (float)pXDirection.getStepZ()) + (double)(f2 * (float)pZDirection.getStepZ());
+            pLevel.addParticle(ParticleTypes.FLAME, (double)pPos.getX() + d0, (double)pPos.getY() + d1, (double)pPos.getZ() + d2, pParticleVec.x, pParticleVec.y, pParticleVec.z);
+        }
+    }
+
+    @Override
+    public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom) {
+    if (pState.getValue(FUSE_STATE) == FuseState.IGNITED) {
+            for (Direction direction : Direction.Plane.HORIZONTAL) {
+                RedstoneSide redstoneSide = pState.getValue(PROPERTY_BY_DIRECTION.get(direction));
+                switch (redstoneSide) {
+                    case UP:
+                        this.spawnParticlesAlongLine(pLevel, pRandom, pPos, Vec3.ZERO, direction, Direction.UP, -0.5F, 0.5F);
+                    case SIDE:
+                        this.spawnParticlesAlongLine(pLevel, pRandom, pPos, Vec3.ZERO, Direction.DOWN, direction, 0.0F, 0.5F);
+                        break;
+                    case NONE:
+                    default:
+                        this.spawnParticlesAlongLine(pLevel, pRandom, pPos, Vec3.ZERO, Direction.DOWN, direction, 0.0F, 0.3F);
+                }
+            }
+        }
+        super.animateTick(pState, pLevel, pPos, pRandom);
     }
 
     private VoxelShape calculateShape(BlockState pState) {
@@ -143,7 +204,7 @@ public class GunpowderFuseBlock extends Block {
             return this.getConnectionState(pLevel, pState, pCurrentPos);
         } else {
             RedstoneSide redstoneside = this.getConnectingSide(pLevel, pCurrentPos, pFacing);
-            return redstoneside.isConnected() == pState.getValue(PROPERTY_BY_DIRECTION.get(pFacing)).isConnected() && !isCross(pState) ? pState.setValue(PROPERTY_BY_DIRECTION.get(pFacing), redstoneside) : this.getConnectionState(pLevel, this.crossState.setValue(PROPERTY_BY_DIRECTION.get(pFacing), redstoneside), pCurrentPos);
+            return redstoneside.isConnected() == pState.getValue(PROPERTY_BY_DIRECTION.get(pFacing)).isConnected() && !isCross(pState) ? pState.setValue(PROPERTY_BY_DIRECTION.get(pFacing), redstoneside) : this.getConnectionState(pLevel, this.crossState.setValue(PROPERTY_BY_DIRECTION.get(pFacing), redstoneside).setValue(FUSE_STATE, pState.getValue(FUSE_STATE)), pCurrentPos);
         }
     }
 
@@ -282,14 +343,6 @@ public class GunpowderFuseBlock extends Block {
             }
 
         }
-    }
-
-    /**
-     * @deprecated call via {@link net.minecraft.world.level.block.state.BlockBehaviour.BlockStateBase#getDirectSignal}
-     * whenever possible. Implementing/overriding is fine.
-     */
-    public int getDirectSignal(BlockState pBlockState, BlockGetter pBlockAccess, BlockPos pPos, Direction pSide) {
-        return pBlockState.getSignal(pBlockAccess, pPos, pSide);
     }
 
 
