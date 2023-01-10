@@ -1,0 +1,16 @@
+{
+    "variants": {
+        "": [{"model": "pyrotechnics:block/gunpowder_ash"},
+            {"model": "pyrotechnics:block/gunpowder_ash_1"},
+            {"model": "pyrotechnics:block/gunpowder_ash_2"},
+            {"model": "pyrotechnics:block/gunpowder_ash", "y": 90},
+            {"model": "pyrotechnics:block/gunpowder_ash", "y": 180},
+            {"model": "pyrotechnics:block/gunpowder_ash", "y": 270},
+            {"model": "pyrotechnics:block/gunpowder_ash_1", "y": 90},
+            {"model": "pyrotechnics:block/gunpowder_ash_1", "y": 180},
+            {"model": "pyrotechnics:block/gunpowder_ash_1", "y": 270},
+            {"model": "pyrotechnics:block/gunpowder_ash_2", "y": 90},
+            {"model": "pyrotechnics:block/gunpowder_ash_2", "y": 180},
+            {"model": "pyrotechnics:block/gunpowder_ash_2", "y": 270}]
+    }
+}

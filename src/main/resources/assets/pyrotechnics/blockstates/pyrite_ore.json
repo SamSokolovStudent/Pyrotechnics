@@ -1,0 +1,23 @@
+{
+    "variants": {
+        "": [{"model": "pyrotechnics:block/pyrite_ore"},
+            {"model": "pyrotechnics:block/pyrite_ore", "x": 90},
+            {"model": "pyrotechnics:block/pyrite_ore", "x": 180},
+            {"model": "pyrotechnics:block/pyrite_ore", "x": 270},
+            {"model": "pyrotechnics:block/pyrite_ore_1", "x": 90},
+            {"model": "pyrotechnics:block/pyrite_ore_1", "x": 180},
+            {"model": "pyrotechnics:block/pyrite_ore_1", "x": 270},
+            {"model": "pyrotechnics:block/pyrite_ore", "y": 90},
+            {"model": "pyrotechnics:block/pyrite_ore", "y": 180},
+            {"model": "pyrotechnics:block/pyrite_ore", "y": 270},
+            {"model": "pyrotechnics:block/pyrite_ore_1", "y": 90},
+            {"model": "pyrotechnics:block/pyrite_ore_1", "y": 180},
+            {"model": "pyrotechnics:block/pyrite_ore_1", "y": 270},
+            {"model": "pyrotechnics:block/pyrite_ore", "z": 90},
+            {"model": "pyrotechnics:block/pyrite_ore", "z": 180},
+            {"model": "pyrotechnics:block/pyrite_ore", "z": 270},
+            {"model": "pyrotechnics:block/pyrite_ore_1", "z": 90},
+            {"model": "pyrotechnics:block/pyrite_ore_1", "z": 180},
+            {"model": "pyrotechnics:block/pyrite_ore_1", "z": 270}]
+    }
+}

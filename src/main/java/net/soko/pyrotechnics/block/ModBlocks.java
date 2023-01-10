@@ -1,8 +1,11 @@
 package net.soko.pyrotechnics.block;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DropExperienceBlock;
+import net.minecraft.world.level.block.NetherrackBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -36,4 +39,18 @@ public class ModBlocks {
                     .noOcclusion()
                     .instabreak()
                     .noCollission()));
+
+    public static final RegistryObject<Block> GUNPOWDER_ASH = BLOCKS.register("gunpowder_ash",
+            () -> new GunpowderAshBlock(Block.Properties.of(Material.SAND)
+                    .strength(0.0F, 0.0F)
+                    .sound(SoundType.SAND)
+                    .noOcclusion()
+                    .instabreak()
+                    .noCollission()));
+
+    public static final RegistryObject<Block> PYRITE_ORE = BLOCKS.register("pyrite_ore",
+            () -> new DropExperienceBlock(BlockBehaviour.Properties.of(Material.STONE)
+                    .requiresCorrectToolForDrops()
+                    .strength(2, 3.0F)
+                    .sound(SoundType.NETHER_GOLD_ORE)));
 }

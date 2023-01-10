@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.soko.pyrotechnics.PyroTechnics;
+import net.soko.pyrotechnics.block.ModBlocks;
 
 public class ModCreativeModeTab {
     public static CreativeModeTab PYROTECHNICS = null;
@@ -22,6 +23,10 @@ public class ModCreativeModeTab {
             event.accept(ModItems.FIREWORKS_BOX.get());
             event.accept(ModItems.LARGE_FIRE_CHARGE.get());
             event.accept(ModItems.GUNPOWDER_FUSE.get());
+            event.accept(ModItems.SALTPETER_DUST.get());
+            event.accept(ModItems.SULFUR_DUST.get());
+            event.accept(ModItems.RAW_PYRITE.get());
+            event.accept(ModItems.PYRITE_ORE.get());
         }
     }
 }

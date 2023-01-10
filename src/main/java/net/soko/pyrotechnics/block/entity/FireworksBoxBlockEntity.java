@@ -56,7 +56,6 @@ public class FireworksBoxBlockEntity extends BlockEntity {
     }
 
 
-
     public ItemStack pop() {
         ItemStack shotFirework = this.fireworks.remove(0);
         ItemStack returnFirework = shotFirework.split(1);

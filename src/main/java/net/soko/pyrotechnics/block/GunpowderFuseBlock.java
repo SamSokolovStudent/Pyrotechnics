@@ -4,22 +4,22 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -66,60 +66,111 @@ public class GunpowderFuseBlock extends Block {
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
         // Check if block is ignited, if so then set neighboring blocks that are unignited to ignited and schedule current block to be set to burnt
         if (pState.getValue(FUSE_STATE) == FuseState.IGNITED) {
+            pLevel.setBlockAndUpdate(pPos, pState.setValue(FUSE_STATE, FuseState.BURNT));
+            pLevel.scheduleTick(pPos, this, 1);
             for (Direction direction : Direction.Plane.HORIZONTAL) {
                 BlockPos blockpos = pState.getValue(PROPERTY_BY_DIRECTION.get(direction)) == RedstoneSide.UP ? pPos.relative(direction).above() : pPos.relative(direction);
-                if (!pLevel.getBlockState(blockpos).is(this)) {
+                if (!shouldConnectTo(pLevel.getBlockState(blockpos))) {
                     blockpos = blockpos.below();
                 }
                 BlockState blockstate = pLevel.getBlockState(blockpos);
-                if (blockstate.is(this) && blockstate.getValue(FUSE_STATE) == FuseState.UNIGNITED) {
-                    pLevel.setBlockAndUpdate(blockpos, blockstate.setValue(FUSE_STATE, FuseState.IGNITED));
-                    pLevel.scheduleTick(blockpos, this, 5);
+                if (shouldConnectTo(blockstate)) {
+                    if (tryIgnite(blockstate, blockpos, pLevel)) {
+                        // Set fuse to burnt state after a short amount of time
+                        pLevel.setBlockAndUpdate(pPos, pState.setValue(FUSE_STATE, FuseState.BURNT));
+                        pLevel.scheduleTick(pPos, this, 7);
+                    }
                 }
             }
+        } else if (pState.getValue(FUSE_STATE) == FuseState.BURNT) {
+            // 75% chance for the block to turn into gunpowder ash
+            if (pRandom.nextFloat() < 0.66f) {
+                pLevel.setBlock(pPos, ModBlocks.GUNPOWDER_ASH.get().defaultBlockState(), 3);
+            } else {
+                pLevel.removeBlock(pPos, false);
+            }
         }
+    }
+
+    public boolean tryIgnite(BlockState blockState, BlockPos blockPos, Level level) {
+        if (blockState.is(this) && blockState.getValue(FUSE_STATE) == FuseState.UNIGNITED) {
+            level.setBlockAndUpdate(blockPos, blockState.setValue(FUSE_STATE, FuseState.IGNITED));
+            level.scheduleTick(blockPos, this, 2);
+            spawnParticles(blockState, level, blockPos, level.random);
+            return true;
+        } else if (blockState.is(ModBlockTags.EXPLODABLE) && blockState.getBlock() instanceof TntBlock tntBlock) {
+            tntBlock.onCaughtFire(blockState, level, blockPos, null, null);
+            level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 11);
+            return true;
+        } else if (blockState.is(ModBlocks.FIREWORKS_BOX.get())) {
+            level.setBlock(blockPos, blockState.setValue(FireworksBoxBlock.TRIGGERED, true), 3);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if (pState.getValue(FUSE_STATE) == FuseState.UNIGNITED) {
-            pLevel.setBlockAndUpdate(pPos, pState.setValue(FUSE_STATE, FuseState.IGNITED));
-            pLevel.scheduleTick(pPos, this, 1);
+            ItemStack playerHeldItem = pPlayer.getItemInHand(pHand);
+            if (!playerHeldItem.is(Items.FLINT_AND_STEEL) && !playerHeldItem.is(Items.FIRE_CHARGE)) {
+                return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+            } else {
+                if (!pPlayer.isCreative()) {
+                    if (playerHeldItem.is(Items.FLINT_AND_STEEL)) {
+                        playerHeldItem.hurtAndBreak(1, pPlayer, (player) -> player.broadcastBreakEvent(pHand));
+                    } else {
+                        playerHeldItem.shrink(1);
+                    }
+                }
+                pLevel.setBlockAndUpdate(pPos, pState.setValue(FUSE_STATE, FuseState.IGNITED));
+                pLevel.scheduleTick(pPos, this, 1);
+                Item item = playerHeldItem.getItem();
+                pPlayer.awardStat(Stats.ITEM_USED.get(item));
+            }
             return InteractionResult.SUCCESS;
         }
         return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
 
-    private void spawnParticlesAlongLine(Level pLevel, RandomSource pRandom, BlockPos pPos, Vec3 pParticleVec, Direction pXDirection, Direction pZDirection, float pMin, float pMax) {
+    private void spawnParticlesAlongLine(ServerLevel pLevel, RandomSource pRandom, BlockPos pPos, Vec3 pParticleVec, Direction pXDirection, Direction pZDirection, float pMin, float pMax) {
         float f = pMax - pMin;
-        if (!(pRandom.nextFloat() >= 0.2F * f)) {
-            float f1 = 0.4375F;
-            float f2 = pMin + f * pRandom.nextFloat();
-            double d0 = 0.5D + (double)(0.4375F * (float)pXDirection.getStepX()) + (double)(f2 * (float)pZDirection.getStepX());
-            double d1 = 0.5D + (double)(0.4375F * (float)pXDirection.getStepY()) + (double)(f2 * (float)pZDirection.getStepY());
-            double d2 = 0.5D + (double)(0.4375F * (float)pXDirection.getStepZ()) + (double)(f2 * (float)pZDirection.getStepZ());
-            pLevel.addParticle(ParticleTypes.FLAME, (double)pPos.getX() + d0, (double)pPos.getY() + d1, (double)pPos.getZ() + d2, pParticleVec.x, pParticleVec.y, pParticleVec.z);
-        }
+        float f2 = pMin + f * pRandom.nextFloat();
+        double d0 = 0.5D + (double) (0.4375F * (float) pXDirection.getStepX()) + (double) (f2 * (float) pZDirection.getStepX());
+        double d1 = 0.5D + (double) (0.4375F * (float) pXDirection.getStepY()) + (double) (f2 * (float) pZDirection.getStepY());
+        double d2 = 0.5D + (double) (0.4375F * (float) pXDirection.getStepZ()) + (double) (f2 * (float) pZDirection.getStepZ());
+        pLevel.sendParticles(ParticleTypes.FLAME, (double) pPos.getX() + d0, (double) pPos.getY() + d1, (double) pPos.getZ() + d2, 2, pParticleVec.x, pParticleVec.y + 0.025, pParticleVec.z, 0.0D);
     }
 
-    @Override
-    public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom) {
-    if (pState.getValue(FUSE_STATE) == FuseState.IGNITED) {
+    public void spawnParticles(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom) {
+        if (pLevel instanceof ServerLevel serverLevel) {
             for (Direction direction : Direction.Plane.HORIZONTAL) {
                 RedstoneSide redstoneSide = pState.getValue(PROPERTY_BY_DIRECTION.get(direction));
                 switch (redstoneSide) {
                     case UP:
-                        this.spawnParticlesAlongLine(pLevel, pRandom, pPos, Vec3.ZERO, direction, Direction.UP, -0.5F, 0.5F);
+                        this.spawnParticlesAlongLine(serverLevel, pRandom, pPos, Vec3.ZERO, direction, Direction.UP, -0.5F, 0.5F);
                     case SIDE:
-                        this.spawnParticlesAlongLine(pLevel, pRandom, pPos, Vec3.ZERO, Direction.DOWN, direction, 0.0F, 0.5F);
+                        this.spawnParticlesAlongLine(serverLevel, pRandom, pPos, Vec3.ZERO, Direction.DOWN, direction, 0.0F, 0.5F);
                         break;
                     case NONE:
                     default:
-                        this.spawnParticlesAlongLine(pLevel, pRandom, pPos, Vec3.ZERO, Direction.DOWN, direction, 0.0F, 0.3F);
+                        this.spawnParticlesAlongLine(serverLevel, pRandom, pPos, Vec3.ZERO, Direction.DOWN, direction, 0.0F, 0.3F);
                 }
             }
         }
-        super.animateTick(pState, pLevel, pPos, pRandom);
+    }
+
+
+    protected static boolean shouldConnectTo(BlockState pState) {
+        if (pState.is(ModBlocks.GUNPOWDER_ASH.get())) {
+            return true;
+        } else if (pState.is(ModBlockTags.EXPLODABLE)) {
+            return true;
+        } else if (pState.is(ModBlocks.FIREWORKS_BOX.get())) {
+            return true;
+        } else {
+            return pState.is(ModBlocks.GUNPOWDER_FUSE_BLOCK.get());
+        }
     }
 
     private VoxelShape calculateShape(BlockState pState) {
@@ -148,7 +199,7 @@ public class GunpowderFuseBlock extends Block {
 
     private BlockState getConnectionState(BlockGetter pLevel, BlockState pState, BlockPos pPos) {
         boolean flag = isDot(pState);
-        pState = this.getMissingConnections(pLevel, this.defaultBlockState(), pPos);
+        pState = this.getMissingConnections(pLevel, this.defaultBlockState().setValue(FUSE_STATE, pState.getValue(FUSE_STATE)), pPos);
         if (flag && isDot(pState)) {
             return pState;
         } else {
@@ -222,20 +273,19 @@ public class GunpowderFuseBlock extends Block {
      */
     public void updateIndirectNeighbourShapes(BlockState pState, LevelAccessor pLevel, BlockPos pPos, int pFlags, int pRecursionLeft) {
         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
-
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             RedstoneSide redstoneside = pState.getValue(PROPERTY_BY_DIRECTION.get(direction));
-            if (redstoneside != RedstoneSide.NONE && !pLevel.getBlockState(blockpos$mutableblockpos.setWithOffset(pPos, direction)).is(this)) {
+            if (redstoneside != RedstoneSide.NONE && !shouldConnectTo(pLevel.getBlockState(blockpos$mutableblockpos.setWithOffset(pPos, direction)))) {
                 blockpos$mutableblockpos.move(Direction.DOWN);
                 BlockState blockstate = pLevel.getBlockState(blockpos$mutableblockpos);
-                if (blockstate.is(this)) {
+                if (shouldConnectTo(blockstate)) {
                     BlockPos blockpos = blockpos$mutableblockpos.relative(direction.getOpposite());
                     pLevel.neighborShapeChanged(direction.getOpposite(), pLevel.getBlockState(blockpos), blockpos$mutableblockpos, blockpos, pFlags, pRecursionLeft);
                 }
 
                 blockpos$mutableblockpos.setWithOffset(pPos, direction).move(Direction.UP);
                 BlockState blockstate1 = pLevel.getBlockState(blockpos$mutableblockpos);
-                if (blockstate1.is(this)) {
+                if (shouldConnectTo(blockstate1)) {
                     BlockPos blockpos1 = blockpos$mutableblockpos.relative(direction.getOpposite());
                     pLevel.neighborShapeChanged(direction.getOpposite(), pLevel.getBlockState(blockpos1), blockpos$mutableblockpos, blockpos1, pFlags, pRecursionLeft);
                 }
@@ -253,7 +303,7 @@ public class GunpowderFuseBlock extends Block {
         BlockState blockstate = pLevel.getBlockState(blockpos);
         if (pNonNormalCubeAbove) {
             boolean flag = this.canSurviveOn(pLevel, blockpos, blockstate);
-            if (flag && pLevel.getBlockState(blockpos.above()).is(this)) {
+            if (flag && shouldConnectTo(pLevel.getBlockState(blockpos.above()))) {
                 if (blockstate.isFaceSturdy(pLevel, blockpos, pDirection.getOpposite())) {
                     return RedstoneSide.UP;
                 }
@@ -262,13 +312,13 @@ public class GunpowderFuseBlock extends Block {
             }
         }
 
-        if (blockstate.is(this)) {
+        if (shouldConnectTo(blockstate)) {
             return RedstoneSide.SIDE;
         } else if (blockstate.isRedstoneConductor(pLevel, blockpos)) {
             return RedstoneSide.NONE;
         } else {
             BlockPos blockPosBelow = blockpos.below();
-            return pLevel.getBlockState(blockPosBelow).is(this) ? RedstoneSide.SIDE : RedstoneSide.NONE;
+            return shouldConnectTo(pLevel.getBlockState(blockPosBelow)) ? RedstoneSide.SIDE : RedstoneSide.NONE;
         }
     }
 
@@ -287,7 +337,7 @@ public class GunpowderFuseBlock extends Block {
      * block is a redstone wire.
      */
     private void checkCornerChangeAt(Level pLevel, BlockPos pPos) {
-        if (pLevel.getBlockState(pPos).is(this)) {
+        if (shouldConnectTo(pLevel.getBlockState(pPos))) {
             pLevel.updateNeighborsAt(pPos, this);
 
             for (Direction direction : Direction.values()) {
@@ -374,8 +424,10 @@ public class GunpowderFuseBlock extends Block {
      */
     public @NotNull BlockState mirror(@NotNull BlockState pState, Mirror pMirror) {
         return switch (pMirror) {
-            case LEFT_RIGHT -> pState.setValue(NORTH, pState.getValue(SOUTH)).setValue(SOUTH, pState.getValue(NORTH));
-            case FRONT_BACK -> pState.setValue(EAST, pState.getValue(WEST)).setValue(WEST, pState.getValue(EAST));
+            case LEFT_RIGHT ->
+                    pState.setValue(NORTH, pState.getValue(SOUTH)).setValue(SOUTH, pState.getValue(NORTH)).setValue(FUSE_STATE, pState.getValue(FUSE_STATE));
+            case FRONT_BACK ->
+                    pState.setValue(EAST, pState.getValue(WEST)).setValue(WEST, pState.getValue(EAST)).setValue(FUSE_STATE, pState.getValue(FUSE_STATE));
             default -> super.mirror(pState, pMirror);
         };
     }

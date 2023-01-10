@@ -19,8 +19,21 @@ public class ModItems {
     public static final RegistryObject<Item> GUNPOWDER_FUSE = ITEMS.register("gunpowder_fuse",
             () -> new BlockItem(ModBlocks.GUNPOWDER_FUSE_BLOCK.get(), new Item.Properties()));
 
+    public static final RegistryObject<Item> PYRITE_ORE = ITEMS.register("pyrite_ore",
+            () -> new BlockItem(ModBlocks.PYRITE_ORE.get(), new Item.Properties()));
+
     public static final RegistryObject<Item> LARGE_FIRE_CHARGE = ITEMS.register("large_fire_charge",
             () -> new Item(new Item.Properties()
                     .stacksTo(16)));
 
+    public static final RegistryObject<Item> SALTPETER_DUST = ITEMS.register("saltpeter_dust",
+            () -> new Item(new Item.Properties()
+                    .fireResistant()));
+
+    public static final RegistryObject<Item> SULFUR_DUST = ITEMS.register("sulfur_dust",
+            () -> new Item(new Item.Properties()
+                    .fireResistant()));
+
+    public static final RegistryObject<Item> RAW_PYRITE = ITEMS.register("raw_pyrite",
+            () -> new Item(new Item.Properties()));
 }

@@ -20,6 +20,7 @@ public class ClientEvents {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.GUNPOWDER_FUSE_BLOCK.get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.GUNPOWDER_ASH.get(), RenderType.cutout());
     }
 
 }
