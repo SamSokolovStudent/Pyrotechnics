@@ -42,11 +42,12 @@ public class CharredGrassBlockEntity extends BlockEntity {
                     }
                     if (pLevel.random.nextInt(5) == 0) {
                         BlockPos possiblePosition = possiblePositions.remove(pLevel.random.nextInt(possiblePositions.size()));
-                        pLevel.setBlockAndUpdate(possiblePosition, ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState());
+                        pLevel.setBlockAndUpdate(possiblePosition, ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true));
                         tempPositions.add(possiblePosition);
                     }
                 }
             }
+            pBlockEntity.positions.clear();
             pBlockEntity.positions.addAll(tempPositions);
             pBlockEntity.iteration++;
         }
