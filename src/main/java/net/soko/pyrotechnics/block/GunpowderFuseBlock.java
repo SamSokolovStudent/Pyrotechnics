@@ -4,17 +4,24 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -133,13 +140,25 @@ public class GunpowderFuseBlock extends Block {
         return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
 
+    public void entityInside(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity) {
+        if (pState.getValue(FUSE_STATE) == FuseState.IGNITED) {
+            if (pEntity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity)pEntity)) {
+                pEntity.setSecondsOnFire(1);
+            }
+        }
+    }
+
     private void spawnParticlesAlongLine(ServerLevel pLevel, RandomSource pRandom, BlockPos pPos, Vec3 pParticleVec, Direction pXDirection, Direction pZDirection, float pMin, float pMax) {
+        ParticleOptions particleType = ParticleTypes.FLAME;
+        if (pLevel.getBlockState(pPos.below()).is(BlockTags.SOUL_FIRE_BASE_BLOCKS)) {
+            particleType = ParticleTypes.SOUL_FIRE_FLAME;
+        }
         float f = pMax - pMin;
         float f2 = pMin + f * pRandom.nextFloat();
         double d0 = 0.5D + (double) (0.4375F * (float) pXDirection.getStepX()) + (double) (f2 * (float) pZDirection.getStepX());
         double d1 = 0.5D + (double) (0.4375F * (float) pXDirection.getStepY()) + (double) (f2 * (float) pZDirection.getStepY());
         double d2 = 0.5D + (double) (0.4375F * (float) pXDirection.getStepZ()) + (double) (f2 * (float) pZDirection.getStepZ());
-        pLevel.sendParticles(ParticleTypes.FLAME, (double) pPos.getX() + d0, (double) pPos.getY() + d1, (double) pPos.getZ() + d2, 2, pParticleVec.x, pParticleVec.y + 0.025, pParticleVec.z, 0.0D);
+        pLevel.sendParticles(particleType, (double) pPos.getX() + d0, (double) pPos.getY() + d1, (double) pPos.getZ() + d2, 2, pParticleVec.x, pParticleVec.y + 0.025, pParticleVec.z, 0.0D);
     }
 
     public void spawnParticles(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom) {
@@ -160,17 +179,8 @@ public class GunpowderFuseBlock extends Block {
         }
     }
 
-
     protected static boolean shouldConnectTo(BlockState pState) {
-        if (pState.is(ModBlocks.GUNPOWDER_ASH.get())) {
-            return true;
-        } else if (pState.is(ModBlockTags.EXPLODABLE)) {
-            return true;
-        } else if (pState.is(ModBlocks.FIREWORKS_BOX.get())) {
-            return true;
-        } else {
-            return pState.is(ModBlocks.GUNPOWDER_FUSE_BLOCK.get());
-        }
+        return pState.is(ModBlockTags.FUSE_CONNECTABLE) || pState.is(ModBlockTags.EXPLODABLE);
     }
 
     private VoxelShape calculateShape(BlockState pState) {
@@ -329,7 +339,7 @@ public class GunpowderFuseBlock extends Block {
     }
 
     private boolean canSurviveOn(BlockGetter pReader, BlockPos pPos, BlockState pState) {
-        return pState.isFaceSturdy(pReader, pPos, Direction.UP) || pState.is(Blocks.HOPPER);
+        return pState.isFaceSturdy(pReader, pPos, Direction.UP);
     }
 
     /**

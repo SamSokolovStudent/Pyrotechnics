@@ -8,4 +8,5 @@ import net.soko.pyrotechnics.PyroTechnics;
 
 public class ModBlockTags {
     public static TagKey<Block> EXPLODABLE = BlockTags.create(new ResourceLocation(PyroTechnics.MOD_ID, "explodable"));
+    public static TagKey<Block> FUSE_CONNECTABLE = BlockTags.create(new ResourceLocation(PyroTechnics.MOD_ID, "fuse_connectable"));
 }

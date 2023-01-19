@@ -1,0 +1,9 @@
+{
+    "type": "minecraft:blasting",
+    "ingredient": {
+        "item": "pyrotechnics:raw_pyrite"
+    },
+    "result": "pyrotechnics:sulfur_dust",
+    "experience": 0.25,
+    "cookingtime": 100
+}

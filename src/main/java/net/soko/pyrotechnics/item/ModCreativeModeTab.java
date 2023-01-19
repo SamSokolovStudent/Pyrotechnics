@@ -20,13 +20,18 @@ public class ModCreativeModeTab {
     }
     public static void buildContents(CreativeModeTabEvent.BuildContents event) {
         if (event.getTab() == PYROTECHNICS) {
-            event.accept(ModItems.FIREWORKS_BOX.get());
             event.accept(ModItems.LARGE_FIRE_CHARGE.get());
             event.accept(ModItems.GUNPOWDER_FUSE.get());
+            event.accept(ModItems.POWDER_FLASK.get());
             event.accept(ModItems.SALTPETER_DUST.get());
             event.accept(ModItems.SULFUR_DUST.get());
+            event.accept(ModItems.ASH.get());
             event.accept(ModItems.RAW_PYRITE.get());
             event.accept(ModItems.PYRITE_ORE.get());
+            event.accept(ModItems.CHARRED_LOG.get());
+            event.accept(ModItems.CHARRED_GRASS_BLOCK.get());
+            event.accept(ModItems.BURNT_GRASS.get());
+            event.accept(ModItems.BURNT_PLANT.get());
         }
     }
 }

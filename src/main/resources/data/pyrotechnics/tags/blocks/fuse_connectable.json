@@ -1,6 +1,8 @@
 {
     "values": [
         "minecraft:tnt",
-        "pyrotechnics:fireworks_box"
+        "pyrotechnics:fireworks_box",
+        "pyrotechnics:gunpowder_fuse",
+        "pyrotechnics:gunpowder_ash"
     ]
 }

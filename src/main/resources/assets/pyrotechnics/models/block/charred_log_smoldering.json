@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:block/cube_column",
+    "textures": {
+        "end": "pyrotechnics:block/charred_log_top_smoldering",
+        "side": "pyrotechnics:block/charred_log_smoldering"
+    }
+}

@@ -1,0 +1,28 @@
+{
+    "display": {
+        "icon": {
+            "item": "pyrotechnics:raw_pyrite"
+        },
+        "title": {
+            "translate": "advancements.nether.pyrotechnics.fool_me_twice.title"
+        },
+        "description": {
+            "translate": "advancements.nether.pyrotechnics.fool_me_twice.description"
+        },
+        "frame": "goal",
+        "show_toast": true,
+        "announce_to_chat": true,
+        "hidden": true
+    },
+    "parent": "pyrotechnics:fool_me_once",
+    "criteria": {
+        "barter_pyrite": {
+            "trigger": "pyrotechnics:barter_pyrite"
+        }
+    },
+    "requirements": [
+        [
+            "barter_pyrite"
+        ]
+    ]
+}

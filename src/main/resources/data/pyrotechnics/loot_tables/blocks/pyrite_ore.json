@@ -2,14 +2,37 @@
     "type": "minecraft:block",
     "pools": [
         {
-            "bonus_rolls": 0.0,
-            "rolls": 1.0,
+            "rolls": 1,
             "entries": [
+                {
+                    "type": "minecraft:item",
+                    "name": "pyrotechnics:sulfur_dust",
+                    "conditions": [
+                        {
+                            "condition": "pyrotechnics:is_explosion"
+                        }
+                    ],
+                    "functions": [
+                        {
+                            "function": "minecraft:set_count",
+                            "count": {
+                                "type": "minecraft:uniform",
+                                "min": 1,
+                                "max": 2
+                            },
+                            "add": false
+                        },
+                        {
+                            "function": "minecraft:explosion_decay"
+                        }
+                    ]
+                },
                 {
                     "type": "minecraft:alternatives",
                     "children": [
                         {
                             "type": "minecraft:item",
+                            "name": "pyrotechnics:pyrite_ore",
                             "conditions": [
                                 {
                                     "condition": "minecraft:match_tool",
@@ -24,18 +47,26 @@
                                         ]
                                     }
                                 }
-                            ],
-                            "name": "pyrotechnics:pyrite_ore"
+                            ]
                         },
                         {
                             "type": "minecraft:item",
+                            "name": "pyrotechnics:raw_pyrite",
+                            "conditions": [
+                                {
+                                    "condition": "minecraft:inverted",
+                                    "term": {
+                                        "condition": "pyrotechnics:is_explosion"
+                                    }
+                                }
+                            ],
                             "functions": [
                                 {
                                     "add": false,
                                     "count": {
                                         "type": "minecraft:uniform",
-                                        "max": 3,
-                                        "min": 1
+                                        "min": 1,
+                                        "max": 2
                                     },
                                     "function": "minecraft:set_count"
                                 },
@@ -43,12 +74,8 @@
                                     "enchantment": "minecraft:fortune",
                                     "formula": "minecraft:ore_drops",
                                     "function": "minecraft:apply_bonus"
-                                },
-                                {
-                                    "function": "minecraft:explosion_decay"
                                 }
-                            ],
-                            "name": "pyrotechnics:raw_pyrite"
+                            ]
                         }
                     ]
                 }

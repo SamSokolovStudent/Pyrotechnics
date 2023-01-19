@@ -1,0 +1,37 @@
+{
+    "display": {
+        "icon": {
+            "item": "pyrotechnics:raw_pyrite"
+        },
+        "title": {
+            "translate": "advancements.nether.pyrotechnics.fool_me_once.title"
+        },
+        "description": {
+            "translate": "advancements.nether.pyrotechnics.fool_me_once.description"
+        },
+        "frame": "task",
+        "show_toast": true,
+        "announce_to_chat": true,
+        "hidden": false
+    },
+    "parent": "minecraft:nether/root",
+    "criteria": {
+        "raw_pyrite": {
+            "trigger": "minecraft:inventory_changed",
+            "conditions": {
+                "items": [
+                    {
+                        "items": [
+                            "pyrotechnics:raw_pyrite"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "requirements": [
+        [
+            "raw_pyrite"
+        ]
+    ]
+}

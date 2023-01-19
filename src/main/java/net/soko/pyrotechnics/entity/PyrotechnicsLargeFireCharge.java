@@ -28,12 +28,14 @@ public class PyrotechnicsLargeFireCharge extends Fireball {
     protected void onHit(HitResult pResult) {
         super.onHit(pResult);
         if (!this.level.isClientSide) {
-            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.level, this.getOwner());
-            this.level.explode(this, this.getX(), this.getY(), this.getZ(), (float)this.explosionPower, flag, Level.ExplosionInteraction.MOB);
+            this.level.explode(this, this.getX(), this.getY(), this.getZ(), (float)this.explosionPower, true, Level.ExplosionInteraction.MOB);
+
             this.discard();
         }
 
     }
+
+
 
     protected void onHitEntity(@NotNull EntityHitResult pResult) {
         super.onHitEntity(pResult);

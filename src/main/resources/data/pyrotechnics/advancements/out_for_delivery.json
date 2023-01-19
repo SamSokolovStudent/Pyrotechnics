@@ -4,10 +4,10 @@
             "item": "pyrotechnics:large_fire_charge"
         },
         "title": {
-            "translate": "advancements.nether.out_for_delivery.title"
+            "translate": "advancements.nether.pyrotechnics.out_for_delivery.title"
         },
         "description": {
-            "translate": "advancements.nether.out_for_delivery.description"
+            "translate": "advancements.nether.pyrotechnics.out_for_delivery.description"
         },
         "frame": "challenge",
         "show_toast": true,

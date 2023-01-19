@@ -1,4 +1,4 @@
-package net.soko.pyrotechnics.events;
+package net.soko.pyrotechnics.event;
 
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;

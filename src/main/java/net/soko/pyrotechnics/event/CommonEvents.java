@@ -1,7 +1,11 @@
-package net.soko.pyrotechnics.events;
+package net.soko.pyrotechnics.event;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -73,11 +77,14 @@ public class CommonEvents {
 
     public static void onItemRightClick(PlayerInteractEvent.RightClickItem event) {
         ItemStack itemStack = event.getItemStack();
+        BlockPos pos = event.getPos();
+        RandomSource random = event.getLevel().random;
         if (itemStack.is(Items.FIRE_CHARGE)) {
             Level level = event.getEntity().getLevel();
             Entity fireball = new SmallFireball(level, event.getEntity(), event.getEntity().getLookAngle().x, event.getEntity().getLookAngle().y, event.getEntity().getLookAngle().z);
             fireball.setPos(event.getEntity().getX(), event.getEntity().getY() + event.getEntity().getEyeHeight(), event.getEntity().getZ());
             level.addFreshEntity(fireball);
+            level.playSound(null, pos, SoundEvents.FIRECHARGE_USE, SoundSource.BLOCKS, 1.0F, (random.nextFloat() - random.nextFloat()) * 0.2F + 1.0F);
             if (!event.getEntity().getAbilities().instabuild) {
                 itemStack.shrink(1);
             }
@@ -88,6 +95,7 @@ public class CommonEvents {
             Entity largeFireball = new PyrotechnicsLargeFireCharge(level, event.getEntity(), event.getEntity().getLookAngle().x, event.getEntity().getLookAngle().y, event.getEntity().getLookAngle().z, 1);
             largeFireball.setPos(event.getEntity().getX(), event.getEntity().getY() + event.getEntity().getEyeHeight(), event.getEntity().getZ());
             level.addFreshEntity(largeFireball);
+            level.playSound(null, pos, SoundEvents.FIRECHARGE_USE, SoundSource.BLOCKS, 1.0F, (random.nextFloat() - random.nextFloat()) * 0.1F + 1.0F);
             if (!event.getEntity().getAbilities().instabuild) {
                 itemStack.shrink(1);
             }

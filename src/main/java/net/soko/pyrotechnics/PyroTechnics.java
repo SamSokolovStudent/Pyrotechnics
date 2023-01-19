@@ -7,12 +7,15 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.soko.pyrotechnics.data.advancements.ModCriteria;
 import net.soko.pyrotechnics.block.ModBlocks;
-import net.soko.pyrotechnics.events.ClientEvents;
+import net.soko.pyrotechnics.data.loot.ModLootConditions;
+import net.soko.pyrotechnics.event.ClientEvents;
 import net.soko.pyrotechnics.entity.ModEntities;
-import net.soko.pyrotechnics.events.CommonEvents;
+import net.soko.pyrotechnics.event.CommonEvents;
 import net.soko.pyrotechnics.item.ModCreativeModeTab;
 import net.soko.pyrotechnics.item.ModItems;
+import net.soko.pyrotechnics.particle.ModParticles;
 import net.soko.pyrotechnics.recipe.ModRecipes;
 import org.slf4j.Logger;
 
@@ -34,6 +37,8 @@ public class PyroTechnics {
         ModEntities.ENTITY_TYPES.register(modEventBus);
         ModBlocks.BLOCK_ENTITY_TYPES.register(modEventBus);
         ModRecipes.RECIPE_SERIALIZERS.register(modEventBus);
+        ModLootConditions.LOOT_CONDITIONS.register(modEventBus);
+        ModParticles.PARTICLE_TYPES.register(modEventBus);
 
 
         // Register the commonSetup method for modloading
@@ -53,6 +58,7 @@ public class PyroTechnics {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
+        ModCriteria.init();
     }
 
 }

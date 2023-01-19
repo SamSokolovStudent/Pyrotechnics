@@ -1,0 +1,24 @@
+{
+    "variants": {
+        "smoldering=false": [
+            {"model": "pyrotechnics:block/charred_grass_block"},
+            {"model": "pyrotechnics:block/charred_grass_block_mirrored", "y": 90},
+            {"model": "pyrotechnics:block/charred_grass_block", "y": 180},
+            {"model": "pyrotechnics:block/charred_grass_block_mirrored", "y": 270}
+        ],
+        "smoldering=true": [
+            {"model": "pyrotechnics:block/charred_grass_block_smoldering"},
+            {"model": "pyrotechnics:block/charred_grass_block_smoldering_mirrored", "y": 90},
+            {"model": "pyrotechnics:block/charred_grass_block_smoldering", "y": 180},
+            {"model": "pyrotechnics:block/charred_grass_block_smoldering_mirrored", "y": 270},
+            {"model": "pyrotechnics:block/charred_grass_block_smoldering_1"},
+            {"model": "pyrotechnics:block/charred_grass_block_smoldering_1_mirrored", "y": 90},
+            {"model": "pyrotechnics:block/charred_grass_block_smoldering_1", "y": 180},
+            {"model": "pyrotechnics:block/charred_grass_block_smoldering_1_mirrored", "y": 270},
+            {"model": "pyrotechnics:block/charred_grass_block_smoldering_2"},
+            {"model": "pyrotechnics:block/charred_grass_block_smoldering_2_mirrored", "y": 90},
+            {"model": "pyrotechnics:block/charred_grass_block_smoldering_2", "y": 180},
+            {"model": "pyrotechnics:block/charred_grass_block_smoldering_2_mirrored", "y": 270}
+        ]
+    }
+}

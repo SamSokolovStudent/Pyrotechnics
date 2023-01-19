@@ -1,0 +1,52 @@
+{
+    "variants": {
+        "axis=x,smoldering=false": [
+            {"model": "pyrotechnics:block/charred_log_horizontal","x": 90, "y": 90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_1","x": 90, "y": 90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_2","x": 90, "y": 90},
+            {"model": "pyrotechnics:block/charred_log_horizontal","x": -90, "y": -90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_1","x": -90, "y": -90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_2","x": -90, "y": -90}
+        ],
+        "axis=y,smoldering=false": [
+            {"model": "pyrotechnics:block/charred_log"},
+            {"model": "pyrotechnics:block/charred_log_1"},
+            {"model": "pyrotechnics:block/charred_log_2"},
+            {"model": "pyrotechnics:block/charred_log", "x": 180, "y": 180},
+            {"model": "pyrotechnics:block/charred_log_1", "x": 180, "y": 180},
+            {"model": "pyrotechnics:block/charred_log_2", "x": 180, "y": 180}
+        ],
+        "axis=z,smoldering=false": [
+            {"model": "pyrotechnics:block/charred_log_horizontal","x": 90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_1","x": 90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_2","x": 90},
+            {"model": "pyrotechnics:block/charred_log_horizontal","x": -90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_1","x": -90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_2","x": -90}
+        ],
+        "axis=x,smoldering=true": [
+            {"model": "pyrotechnics:block/charred_log_horizontal_smoldering","x": 90, "y": 90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_1_smoldering","x": 90, "y": 90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_2_smoldering","x": 90, "y": 90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_smoldering","x": -90, "y": -90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_1_smoldering","x": -90, "y": -90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_2_smoldering","x": -90, "y": -90}
+        ],
+        "axis=y,smoldering=true": [
+            {"model": "pyrotechnics:block/charred_log_smoldering"},
+            {"model": "pyrotechnics:block/charred_log_1_smoldering"},
+            {"model": "pyrotechnics:block/charred_log_2_smoldering"},
+            {"model": "pyrotechnics:block/charred_log_smoldering", "x": 180, "y": 180},
+            {"model": "pyrotechnics:block/charred_log_1_smoldering", "x": 180, "y": 180},
+            {"model": "pyrotechnics:block/charred_log_2_smoldering", "x": 180, "y": 180}
+        ],
+        "axis=z,smoldering=true": [
+            {"model": "pyrotechnics:block/charred_log_horizontal_smoldering","x": 90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_1_smoldering","x": 90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_2_smoldering","x": 90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_smoldering","x": -90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_1_smoldering","x": -90},
+            {"model": "pyrotechnics:block/charred_log_horizontal_2_smoldering","x": -90}
+        ]
+    }
+}
