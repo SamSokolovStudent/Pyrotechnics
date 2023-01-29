@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -24,9 +25,11 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.fml.common.Mod;
 import net.soko.pyrotechnics.block.entity.CharredGrassBlockEntity;
 import net.soko.pyrotechnics.item.ModItems;
 import org.jetbrains.annotations.Nullable;
@@ -34,10 +37,11 @@ import org.jetbrains.annotations.Nullable;
 public class CharredGrassBlock extends BaseEntityBlock {
     public static final BooleanProperty SMOLDERING = BooleanProperty.create("smoldering");
     public static final BooleanProperty IS_SOURCE = BooleanProperty.create("is_source");
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
     public CharredGrassBlock(Properties pProperties) {
         super(pProperties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(SMOLDERING, false).setValue(IS_SOURCE, false));
+        this.registerDefaultState(this.stateDefinition.any().setValue(SMOLDERING, false).setValue(IS_SOURCE, false).setValue(LIT, false));
     }
 
     @Override
@@ -60,6 +64,8 @@ public class CharredGrassBlock extends BaseEntityBlock {
                     pLevel.addFreshEntity(itementity);
                     Item item = playerHeldItem.getItem();
                     pPlayer.awardStat(Stats.ITEM_USED.get(item));
+                    return InteractionResult.SUCCESS;
+                } else {
                     return InteractionResult.SUCCESS;
                 }
             } else if (playerHeldItem.is(Items.FLINT_AND_STEEL) || playerHeldItem.is(Items.FIRE_CHARGE)) {
@@ -93,8 +99,16 @@ public class CharredGrassBlock extends BaseEntityBlock {
 
     @Override
     public void randomTick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
+        // check if block above is grass block or fern
+        if (pLevel.getBlockState(pPos.above()).is(BlockTags.REPLACEABLE_PLANTS)) {
+            if (pLevel.getBlockState(pPos.above()).is(Blocks.GRASS)) {
+                pLevel.setBlockAndUpdate(pPos.above(), ModBlocks.BURNT_GRASS.get().defaultBlockState());
+            } else if (pLevel.getBlockState(pPos.above()).is(Blocks.FERN) || pLevel.getBlockState(pPos.above()).is(BlockTags.FLOWERS)) {
+                pLevel.setBlockAndUpdate(pPos.above(), ModBlocks.BURNT_PLANT.get().defaultBlockState());
+            }
+            }
         if (pRandom.nextInt(7) > 1) {
-            pLevel.setBlockAndUpdate(pPos, pState.setValue(SMOLDERING, false));
+            pLevel.setBlockAndUpdate(pPos, pState.setValue(SMOLDERING, false).setValue(LIT, false));
         }
         super.randomTick(pState, pLevel, pPos, pRandom);
     }
@@ -102,6 +116,7 @@ public class CharredGrassBlock extends BaseEntityBlock {
     @Override
     public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom) {
         if (pState.getValue(SMOLDERING)) {
+            pState.setValue(LIT, true);
             BlockPos above = pPos.above();
             pLevel.addParticle(ParticleTypes.SMALL_FLAME, (double) above.getX() + pRandom.nextDouble(), (double) above.getY() + 0.1, (double) above.getZ() + pRandom.nextDouble(), 0.0D, 0.0D, 0.0D);
             super.animateTick(pState, pLevel, pPos, pRandom);
@@ -109,7 +124,7 @@ public class CharredGrassBlock extends BaseEntityBlock {
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(SMOLDERING, IS_SOURCE);
+        pBuilder.add(SMOLDERING, IS_SOURCE, LIT);
 
     }
 

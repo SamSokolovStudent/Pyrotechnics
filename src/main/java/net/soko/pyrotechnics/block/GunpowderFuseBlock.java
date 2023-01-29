@@ -8,6 +8,8 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
@@ -16,6 +18,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -37,6 +40,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.soko.pyrotechnics.item.ModItems;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -89,13 +93,6 @@ public class GunpowderFuseBlock extends Block {
                     }
                 }
             }
-        } else if (pState.getValue(FUSE_STATE) == FuseState.BURNT) {
-            // 75% chance for the block to turn into gunpowder ash
-            if (pRandom.nextFloat() < 0.66f) {
-                pLevel.setBlock(pPos, ModBlocks.GUNPOWDER_ASH.get().defaultBlockState(), 3);
-            } else {
-                pLevel.removeBlock(pPos, false);
-            }
         }
     }
 
@@ -104,6 +101,7 @@ public class GunpowderFuseBlock extends Block {
             level.setBlockAndUpdate(blockPos, blockState.setValue(FUSE_STATE, FuseState.IGNITED));
             level.scheduleTick(blockPos, this, 2);
             spawnParticles(blockState, level, blockPos, level.random);
+            level.playSound(null, blockPos, SoundEvents.CREEPER_PRIMED, SoundSource.BLOCKS, 0.7F, 2.0F);
             return true;
         } else if (blockState.is(ModBlockTags.EXPLODABLE) && blockState.getBlock() instanceof TntBlock tntBlock) {
             tntBlock.onCaughtFire(blockState, level, blockPos, null, null);
@@ -136,13 +134,22 @@ public class GunpowderFuseBlock extends Block {
                 pPlayer.awardStat(Stats.ITEM_USED.get(item));
             }
             return InteractionResult.SUCCESS;
+        } else if (pState.getValue(FUSE_STATE) == FuseState.BURNT) {
+            pLevel.setBlockAndUpdate(pPos, Blocks.AIR.defaultBlockState());
+            double d0 = (double) (pLevel.random.nextFloat() * 0.7F) + (double) 0.15F;
+            double d1 = (double) (pLevel.random.nextFloat() * 0.7F) + (double) 0.060000002F + 0.6D;
+            double d2 = (double) (pLevel.random.nextFloat() * 0.7F) + (double) 0.15F;
+            ItemEntity itementity = new ItemEntity(pLevel, (double) pPos.getX() + d0, (double) pPos.getY() + d1 -0.9f, (double) pPos.getZ() + d2, new ItemStack(ModItems.ASH.get()));
+            itementity.setDefaultPickUpDelay();
+            pLevel.addFreshEntity(itementity);
+            return InteractionResult.SUCCESS;
         }
         return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
 
     public void entityInside(BlockState pState, Level pLevel, BlockPos pPos, Entity pEntity) {
         if (pState.getValue(FUSE_STATE) == FuseState.IGNITED) {
-            if (pEntity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity)pEntity)) {
+            if (pEntity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity) pEntity)) {
                 pEntity.setSecondsOnFire(1);
             }
         }
@@ -199,8 +206,17 @@ public class GunpowderFuseBlock extends Block {
     }
 
     @Override
-    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        return SHAPES_CACHE.getOrDefault(pState.setValue(FUSE_STATE, FuseState.UNIGNITED), SHAPE_DOT);
+    public VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos pos, CollisionContext collisionContext) {
+//        if (blockState.getValue(FUSE_STATE) == FuseState.BURNT) {
+//            Vec3 vec3 = blockState.getOffset(blockGetter, pos);
+//            return SHAPES_CACHE.getOrDefault(blockState.setValue(FUSE_STATE, FuseState.UNIGNITED), SHAPE_DOT).move(vec3.x, vec3.y, vec3.z);
+//        } else {
+        return SHAPES_CACHE.getOrDefault(blockState.setValue(FUSE_STATE, FuseState.UNIGNITED), SHAPE_DOT);
+    }
+
+    @Override
+    public float getMaxHorizontalOffset() {
+        return 0.5F;
     }
 
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {

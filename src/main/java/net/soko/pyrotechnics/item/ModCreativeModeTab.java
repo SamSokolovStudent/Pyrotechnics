@@ -23,6 +23,7 @@ public class ModCreativeModeTab {
             event.accept(ModItems.LARGE_FIRE_CHARGE.get());
             event.accept(ModItems.GUNPOWDER_FUSE.get());
             event.accept(ModItems.POWDER_FLASK.get());
+            event.accept(ModItems.BLASTING_BOX.get());
             event.accept(ModItems.SALTPETER_DUST.get());
             event.accept(ModItems.SULFUR_DUST.get());
             event.accept(ModItems.ASH.get());
@@ -32,6 +33,8 @@ public class ModCreativeModeTab {
             event.accept(ModItems.CHARRED_GRASS_BLOCK.get());
             event.accept(ModItems.BURNT_GRASS.get());
             event.accept(ModItems.BURNT_PLANT.get());
+            event.accept(ModItems.GUANO.get());
+            event.accept(ModItems.TUNNEL_BOMB.get());
         }
     }
 }

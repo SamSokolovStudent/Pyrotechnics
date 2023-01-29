@@ -1,0 +1,6 @@
+{
+    "parent": "pyrotechnics:block/gunpowder_fuse_side_burnt",
+    "textures": {
+        "line": "pyrotechnics:block/gunpowder_fuse_line1_burnt"
+    }
+}

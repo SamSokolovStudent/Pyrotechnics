@@ -3,6 +3,7 @@
         "minecraft:tnt",
         "pyrotechnics:fireworks_box",
         "pyrotechnics:gunpowder_fuse",
-        "pyrotechnics:gunpowder_ash"
+        "pyrotechnics:gunpowder_ash",
+        "pyrotechnics:blasting_box"
     ]
 }

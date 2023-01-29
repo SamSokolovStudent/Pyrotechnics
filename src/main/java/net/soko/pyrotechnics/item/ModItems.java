@@ -27,6 +27,9 @@ public class ModItems {
                     .stacksTo(1)
                     .rarity(Rarity.UNCOMMON)));
 
+    public static final RegistryObject<Item> BLASTING_BOX = ITEMS.register("blasting_box",
+            () -> new BlockItem(ModBlocks.BLASTING_BOX.get(), new Item.Properties()));
+
     public static final RegistryObject<Item> PYRITE_ORE = ITEMS.register("pyrite_ore",
             () -> new BlockItem(ModBlocks.PYRITE_ORE.get(), new Item.Properties()
                     .fireResistant()));
@@ -60,4 +63,10 @@ public class ModItems {
 
     public static final RegistryObject<Item> BURNT_PLANT = ITEMS.register("burnt_plant",
             () -> new BlockItem(ModBlocks.BURNT_PLANT.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> GUANO = ITEMS.register("guano",
+            () -> new BlockItem(ModBlocks.GUANO.get(), new Item.Properties()));
+
+    public static final RegistryObject<Item> TUNNEL_BOMB = ITEMS.register("tunnel_bomb",
+            () -> new BlockItem(ModBlocks.TUNNEL_BOMB.get(), new Item.Properties()));
 }

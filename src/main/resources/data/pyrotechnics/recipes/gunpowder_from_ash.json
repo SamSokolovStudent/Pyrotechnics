@@ -1,5 +1,6 @@
 {
     "type": "minecraft:crafting_shapeless",
+    "category": "misc",
     "ingredients": [
         {
             "item": "pyrotechnics:saltpeter_dust"
@@ -8,7 +9,7 @@
             "item": "pyrotechnics:sulfur_dust"
         },
         {
-            "item": "minecraft:charcoal"
+            "item": "pyrotechnics:ash"
         }
     ],
     "result": {

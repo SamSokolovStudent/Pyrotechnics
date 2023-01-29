@@ -1,0 +1,28 @@
+{
+    "variants": {
+        "facing=east,activated=false": [
+            {"model": "pyrotechnics:block/blasting_box", "y": 90}
+        ],
+        "facing=east,activated=true": [
+            {"model": "pyrotechnics:block/blasting_box_used", "y": 90}
+        ],
+        "facing=west,activated=false": [
+            {"model": "pyrotechnics:block/blasting_box", "y": 270}
+        ],
+        "facing=west,activated=true": [
+            {"model": "pyrotechnics:block/blasting_box_used", "y": 270}
+        ],
+        "facing=south,activated=false": [
+            {"model": "pyrotechnics:block/blasting_box", "y": 180}
+        ],
+        "facing=south,activated=true": [
+            {"model": "pyrotechnics:block/blasting_box_used", "y": 180}
+        ],
+        "facing=north,activated=false": [
+            {"model": "pyrotechnics:block/blasting_box"}
+        ],
+        "facing=north,activated=true": [
+            {"model": "pyrotechnics:block/blasting_box_used"}
+        ]
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "category": "misc",
+    "ingredients": [
+        {
+            "item": "pyrotechnics:saltpeter_dust"
+        },
+        {
+            "item": "pyrotechnics:sulfur_dust"
+        },
+        {
+            "item": "minecraft:charcoal"
+        }
+    ],
+    "result": {
+        "item": "minecraft:gunpowder",
+        "count": 3
+    }
+}

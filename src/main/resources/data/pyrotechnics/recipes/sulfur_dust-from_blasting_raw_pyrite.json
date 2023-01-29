@@ -1,9 +1,10 @@
 {
+    "category": "misc",
     "type": "minecraft:blasting",
     "ingredient": {
         "item": "pyrotechnics:raw_pyrite"
     },
     "result": "pyrotechnics:sulfur_dust",
-    "experience": 0.25,
+    "experience": 0.35,
     "cookingtime": 100
 }

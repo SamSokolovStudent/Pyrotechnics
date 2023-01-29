@@ -28,7 +28,7 @@ public class FireBlockMixin {
             if (randomSource.nextFloat() < 0.3) {
                 pyrotechnics$setNeighbourFire(level, pos);
                 if (level.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK)) {
-                    level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true));
+                    level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
                 }
             }
             level.removeBlock(pos, false);
@@ -52,7 +52,7 @@ public class FireBlockMixin {
             if (randomSource.nextFloat() < 0.3) {
                 pyrotechnics$setNeighbourFire(level, pos);
                 if (level.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK)) {
-                    level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true));
+                    level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
                 }
             }
             level.removeBlock(pos, false);
@@ -70,9 +70,9 @@ public class FireBlockMixin {
     private static void pyrotechnics$charBlock(Level level, BlockPos pos, BlockState state) {
         if (state.hasProperty(RotatedPillarBlock.AXIS)) {
             Direction.Axis rotationState = state.getValue(RotatedPillarBlock.AXIS);
-            level.setBlockAndUpdate(pos, ModBlocks.CHARRED_LOG.get().defaultBlockState().setValue(RotatedPillarBlock.AXIS, rotationState).setValue(CharredLogBlock.SMOLDERING, true));
+            level.setBlockAndUpdate(pos, ModBlocks.CHARRED_LOG.get().defaultBlockState().setValue(RotatedPillarBlock.AXIS, rotationState).setValue(CharredLogBlock.SMOLDERING, true).setValue(CharredLogBlock.LIT, true));
         } else {
-            level.setBlockAndUpdate(pos, ModBlocks.CHARRED_LOG.get().defaultBlockState().setValue(CharredLogBlock.SMOLDERING, true));
+            level.setBlockAndUpdate(pos, ModBlocks.CHARRED_LOG.get().defaultBlockState().setValue(CharredLogBlock.SMOLDERING, true).setValue(CharredLogBlock.LIT, true));
         }
         pyrotechnics$setNeighbourFire(level, pos);
     }
@@ -99,13 +99,13 @@ public class FireBlockMixin {
         if (level.getBlockState(pos).is(Blocks.GRASS)) {
             level.setBlock(pos, ModBlocks.BURNT_GRASS.get().defaultBlockState(), 3);
             if (level.getBlockState(pos.below()).is(grassBlock)) {
-                level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true));
+                level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
 
             }
         } else {
             level.setBlock(pos, ModBlocks.BURNT_PLANT.get().defaultBlockState(), 3);
             if (level.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK)) {
-                level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true));
+                level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
             }
         }
     }

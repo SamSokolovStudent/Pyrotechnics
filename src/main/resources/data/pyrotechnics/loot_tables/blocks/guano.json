@@ -5,34 +5,11 @@
             "rolls": 1,
             "entries": [
                 {
-                    "type": "minecraft:item",
-                    "name": "pyrotechnics:ash",
-                    "conditions": [
-                        {
-                            "condition": "pyrotechnics:is_explosion"
-                        }
-                    ],
-                    "functions": [
-                        {
-                            "function": "minecraft:set_count",
-                            "count": {
-                                "type": "minecraft:uniform",
-                                "min": 1,
-                                "max": 2
-                            },
-                            "add": false
-                        },
-                        {
-                            "function": "minecraft:explosion_decay"
-                        }
-                    ]
-                },
-                {
                     "type": "minecraft:alternatives",
                     "children": [
                         {
                             "type": "minecraft:item",
-                            "name": "pyrotechnics:charred_log",
+                            "name": "pyrotechnics:guano",
                             "conditions": [
                                 {
                                     "condition": "minecraft:match_tool",
@@ -51,29 +28,27 @@
                         },
                         {
                             "type": "minecraft:item",
-                            "name": "minecraft:charcoal",
-                            "conditions": [
-                                {
-                                    "condition": "minecraft:inverted",
-                                    "term": {
-                                        "condition": "pyrotechnics:is_explosion"
-                                    }
-                                }
-                            ],
+                            "name": "pyrotechnics:saltpeter_dust",
                             "functions": [
                                 {
                                     "add": false,
                                     "count": {
                                         "type": "minecraft:uniform",
-                                        "min": 1,
-                                        "max": 2
+                                        "max": 2,
+                                        "min": 1
                                     },
                                     "function": "minecraft:set_count"
                                 },
                                 {
                                     "enchantment": "minecraft:fortune",
-                                    "formula": "minecraft:ore_drops",
-                                    "function": "minecraft:apply_bonus"
+                                    "formula": "minecraft:uniform_bonus_count",
+                                    "function": "minecraft:apply_bonus",
+                                    "parameters": {
+                                        "bonusMultiplier": 1
+                                    }
+                                },
+                                {
+                                    "function": "minecraft:explosion_decay"
                                 }
                             ]
                         }

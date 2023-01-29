@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import org.jetbrains.annotations.Nullable;
@@ -27,10 +28,11 @@ import org.jetbrains.annotations.Nullable;
 public class CharredLogBlock extends RotatedPillarBlock {
     public static final BooleanProperty SMOLDERING = BooleanProperty.create("smoldering");
     public static final EnumProperty<Direction.Axis> AXIS = RotatedPillarBlock.AXIS;
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
     public CharredLogBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(SMOLDERING, false).setValue(AXIS, Direction.Axis.Y));
+        this.registerDefaultState(this.stateDefinition.any().setValue(SMOLDERING, false).setValue(AXIS, Direction.Axis.Y).setValue(LIT, false));
     }
 
     @Override
@@ -56,10 +58,10 @@ public class CharredLogBlock extends RotatedPillarBlock {
                 if (pRandom.nextFloat() > 0.6f) {
                     // do nothing to keep the top block smoldering for longer, making more particles spawn
                 } else {
-                    pLevel.setBlock(pPos, pState.setValue(SMOLDERING, false), Block.UPDATE_ALL);
+                    pLevel.setBlock(pPos, pState.setValue(SMOLDERING, false).setValue(LIT, false), Block.UPDATE_ALL);
                 }
-                }
-            } else {
+            }
+        } else {
             pLevel.setBlock(pPos, pState.setValue(SMOLDERING, false), Block.UPDATE_ALL);
         }
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
@@ -67,22 +69,28 @@ public class CharredLogBlock extends RotatedPillarBlock {
             BlockPos neighbourPos = mutablePos.setWithOffset(pPos, direction);
             BlockState neighbourState = pLevel.getBlockState(neighbourPos);
             if (neighbourState.is(BlockTags.LOGS_THAT_BURN) || neighbourState.is(BlockTags.LEAVES)) {
-                for (Direction neighbourDirection : Direction.values()) {
-                    BlockPos neighbourNeighbourPos = mutablePos.setWithOffset(neighbourPos, neighbourDirection);
-                    if (BaseFireBlock.canBePlacedAt(pLevel, neighbourNeighbourPos, neighbourDirection.getOpposite())) {
-                        pLevel.setBlock(neighbourNeighbourPos, BaseFireBlock.getState(pLevel, neighbourNeighbourPos), 3);
+                for (int x = -1; x <= 1; x++) {
+                    for (int y = -1; y <= 1; y++) {
+                        for (int z = -1; z <= 1; z++) {
+                            if (x == 0 && y == 0 && z == 0) continue;
+                            BlockPos neighbourNeighbourPos = mutablePos.set(pPos.getX() + x, pPos.getY() + y, pPos.getZ() + z);
+                            if (BaseFireBlock.canBePlacedAt(pLevel, neighbourNeighbourPos, Direction.UP)) {
+                                pLevel.setBlockAndUpdate(neighbourNeighbourPos, BaseFireBlock.getState(pLevel, neighbourNeighbourPos));
+                            }
+                            if (neighbourState.is(BlockTags.REPLACEABLE_PLANTS) || neighbourState.is(BlockTags.FLOWERS) || pLevel.getBlockState(neighbourPos).is(Blocks.TALL_GRASS) || pLevel.getBlockState(neighbourPos).is(Blocks.LARGE_FERN)) {
+                                if (pLevel.getBlockState(neighbourPos).is(Blocks.GRASS)) {
+                                    pLevel.setBlockAndUpdate(neighbourPos, ModBlocks.BURNT_GRASS.get().defaultBlockState());
+                                } else if (pLevel.getBlockState(neighbourPos).is(Blocks.VINE)) {
+                                    pLevel.setBlockAndUpdate(neighbourPos, Blocks.AIR.defaultBlockState());
+                                    if (BaseFireBlock.canBePlacedAt(pLevel, neighbourPos, direction.getOpposite())) {
+                                        pLevel.setBlockAndUpdate(neighbourPos, BaseFireBlock.getState(pLevel, neighbourPos));
+                                    }
+                                } else {
+                                    pLevel.setBlockAndUpdate(neighbourPos, ModBlocks.BURNT_PLANT.get().defaultBlockState());
+                                }
+                            }
+                        }
                     }
-                }
-            } else if (neighbourState.is(BlockTags.REPLACEABLE_PLANTS) || neighbourState.is(BlockTags.FLOWERS) || pLevel.getBlockState(neighbourPos).is(Blocks.TALL_GRASS) || pLevel.getBlockState(neighbourPos).is(Blocks.LARGE_FERN)) {
-                if (pLevel.getBlockState(neighbourPos).is(Blocks.GRASS)) {
-                    pLevel.setBlock(neighbourPos, ModBlocks.BURNT_GRASS.get().defaultBlockState(), 3);
-                } else if (pLevel.getBlockState(neighbourPos).is(Blocks.VINE)) {
-                    pLevel.setBlock(neighbourPos, Blocks.AIR.defaultBlockState(), 3);
-                    if (BaseFireBlock.canBePlacedAt(pLevel, neighbourPos, direction.getOpposite())) {
-                        pLevel.setBlock(neighbourPos, BaseFireBlock.getState(pLevel, neighbourPos), 3);
-                    }
-                } else {
-                    pLevel.setBlock(neighbourPos, ModBlocks.BURNT_PLANT.get().defaultBlockState(), 3);
                 }
             }
         }
@@ -91,17 +99,16 @@ public class CharredLogBlock extends RotatedPillarBlock {
     @Override
     public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom) {
         if (pState.getValue(SMOLDERING)) {
+            pState.setValue(LIT, true);
             BlockPos above = pPos.above();
             if (pLevel.isEmptyBlock(above)) {
                 RandomSource randomSource = pLevel.random;
-                pLevel.addAlwaysVisibleParticle(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, true, (double)pPos.getX() + 0.5D + randomSource.nextDouble() / 3.0D * (double)(randomSource.nextBoolean() ? 1 : -1), (double)pPos.getY() + randomSource.nextDouble() + randomSource.nextDouble(), (double)pPos.getZ() + 0.5D + randomSource.nextDouble() / 3.0D * (double)(randomSource.nextBoolean() ? 1 : -1), 0.0D, 0.07D, 0.0D);
-                pLevel.addParticle(ParticleTypes.SMOKE, (double)pPos.getX() + 0.5D + randomSource.nextDouble() / 4.0D * (double)(randomSource.nextBoolean() ? 1 : -1), (double)pPos.getY() + 0.4D, (double)pPos.getZ() + 0.5D + randomSource.nextDouble() / 4.0D * (double)(randomSource.nextBoolean() ? 1 : -1), 0.0D, 0.005D, 0.0D);
+                pLevel.addAlwaysVisibleParticle(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, true, (double) pPos.getX() + 0.5D + randomSource.nextDouble() / 3.0D * (double) (randomSource.nextBoolean() ? 1 : -1), (double) pPos.getY() + randomSource.nextDouble() + randomSource.nextDouble(), (double) pPos.getZ() + 0.5D + randomSource.nextDouble() / 3.0D * (double) (randomSource.nextBoolean() ? 1 : -1), 0.0D, 0.07D, 0.0D);
+                pLevel.addParticle(ParticleTypes.SMOKE, (double) pPos.getX() + 0.5D + randomSource.nextDouble() / 4.0D * (double) (randomSource.nextBoolean() ? 1 : -1), (double) pPos.getY() + 0.4D, (double) pPos.getZ() + 0.5D + randomSource.nextDouble() / 4.0D * (double) (randomSource.nextBoolean() ? 1 : -1), 0.0D, 0.005D, 0.0D);
             }
         }
         super.animateTick(pState, pLevel, pPos, pRandom);
     }
-
-
 
 
     public void stepOn(Level pLevel, BlockPos pPos, BlockState pState, Entity pEntity) {
@@ -114,6 +121,6 @@ public class CharredLogBlock extends RotatedPillarBlock {
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(SMOLDERING, AXIS);
+        pBuilder.add(SMOLDERING, AXIS, LIT);
     }
 }
