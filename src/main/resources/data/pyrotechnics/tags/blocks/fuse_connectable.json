@@ -4,6 +4,7 @@
         "pyrotechnics:fireworks_box",
         "pyrotechnics:gunpowder_fuse",
         "pyrotechnics:gunpowder_ash",
-        "pyrotechnics:blasting_box"
+        "pyrotechnics:blasting_box",
+        "pyrotechnics:tunnel_bomb"
     ]
 }

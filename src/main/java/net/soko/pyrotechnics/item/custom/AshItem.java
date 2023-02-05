@@ -44,7 +44,7 @@ public class AshItem extends Item {
             // Get count of ash in stack, limit to 16 per cauldron water level
             int itemStackCount = Math.min(itemstack.getCount(), 16);
             itemstack.shrink(itemStackCount);
-            // randomly remove 1-4 items from itemStackCount
+            // randomly remove 1-6 items from itemStackCount
             itemStackCount = itemStackCount - level.random.nextInt(6);
             if (state.getValue(LayeredCauldronBlock.LEVEL) > 1) {
                 level.setBlockAndUpdate(pos, state.setValue(LayeredCauldronBlock.LEVEL, state.getValue(LayeredCauldronBlock.LEVEL) - 1));
