@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.soko.pyrotechnics.block.CharredGrassBlock;
+import net.soko.pyrotechnics.block.ModBlockTags;
 import net.soko.pyrotechnics.block.ModBlocks;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class CharredGrassBlockEntity extends BlockEntity {
                     for (int z = -1; z <= 1; z++) {
                         if (x == 0 && y == 0 && z == 0) continue;
                         mutableBlockPos.set(pPos.getX() + x, pPos.getY() + y, pPos.getZ() + z);
-                        if (!pLevel.getBlockState(mutableBlockPos).is(Blocks.GRASS_BLOCK)) continue;
+                        if (!pLevel.getBlockState(mutableBlockPos).is(ModBlockTags.CHARRABLE_GRASS)) continue;
                         possiblePositions.add(mutableBlockPos.immutable());
                     }
                 }

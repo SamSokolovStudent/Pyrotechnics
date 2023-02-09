@@ -19,7 +19,7 @@ public class IsExplosionCondition implements LootItemCondition {
 
     @Override
     public LootItemConditionType getType() {
-        return null;
+        return ModLootConditions.IS_EXPLOSION.get();
     }
 
     @Override
@@ -36,10 +36,22 @@ public class IsExplosionCondition implements LootItemCondition {
 
         @Override
         public void serialize(JsonObject pJson, IsExplosionCondition pValue, JsonSerializationContext pSerializationContext) {
+
         }
 
         @Override
         public IsExplosionCondition deserialize(JsonObject pJson, JsonDeserializationContext pSerializationContext) {
+            return IsExplosionCondition.INSTANCE;
+        }
+    }
+
+    public static Builder condition() {
+        return new Builder();
+    }
+
+    public static class Builder implements LootItemCondition.Builder {
+        @Override
+        public LootItemCondition build() {
             return IsExplosionCondition.INSTANCE;
         }
     }

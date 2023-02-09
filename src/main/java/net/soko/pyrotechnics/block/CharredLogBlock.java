@@ -37,10 +37,11 @@ public class CharredLogBlock extends RotatedPillarBlock {
 
     @Override
     public void playerDestroy(Level pLevel, Player pPlayer, BlockPos pPos, BlockState pState, @Nullable BlockEntity pBlockEntity, ItemStack pTool) {
-        if (pState.getValue(SMOLDERING)) {
+        if (pState.getValue(SMOLDERING) && pLevel instanceof ServerLevel) {
             // lava particle if smoldering
-            pLevel.addParticle(ParticleTypes.LAVA, (double) pPos.getX() + 0.5D, (double) pPos.getY() + 0.5D, (double) pPos.getZ() + 0.5D, (double) (pLevel.random.nextFloat() / 2.0F), 5.0E-5D, (double) (pLevel.random.nextFloat() / 2.0F));
+            ((ServerLevel) pLevel).sendParticles(ParticleTypes.LAVA, pPos.getX() + 0.5, pPos.getY() + 0.5, pPos.getZ() + 0.5, 10, 0.5, 0.5, 0.5, 0.1);
         }
+        super.playerDestroy(pLevel, pPlayer, pPos, pState, pBlockEntity, pTool);
     }
 
     @Override

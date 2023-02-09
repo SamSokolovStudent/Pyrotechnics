@@ -1,0 +1,7 @@
+// 1.19.3	2023-02-05T22:15:44.3519343	Loot Tables
+6f4b01e8cabe6c83e03aa4af283bf4ffa4835e9c data/pyrotechnics/loot_tables/blocks/burnt_grass.json
+f51cf1e420b1e1e0871a3f1999f8c8f883c89129 data/pyrotechnics/loot_tables/blocks/burnt_plant.json
+72ef75d249f91ed85cc13cff9b9549a59df74096 data/pyrotechnics/loot_tables/blocks/charred_grass_block.json
+f09974b131ad6fb3cf7c20715b24c61ac7c0f36f data/pyrotechnics/loot_tables/blocks/charred_log.json
+088391fc3a6c20e8fb283ecbf5bd40be9b208f31 data/pyrotechnics/loot_tables/blocks/pyrite_ore.json
+ccb2642c51e44c83050d78866aada0e232221545 data/pyrotechnics/loot_tables/blocks/tunnel_bomb.json

@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.soko.pyrotechnics.block.CharredGrassBlock;
 import net.soko.pyrotechnics.block.CharredLogBlock;
+import net.soko.pyrotechnics.block.ModBlockTags;
 import net.soko.pyrotechnics.block.ModBlocks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -27,13 +28,13 @@ public class FireBlockMixin {
         } else if (state.is(BlockTags.LEAVES)) {
             if (randomSource.nextFloat() < 0.3) {
                 pyrotechnics$setNeighbourFire(level, pos);
-                if (level.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK)) {
+                if (level.getBlockState(pos.below()).is(ModBlockTags.CHARRABLE_GRASS)) {
                     level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
                 }
             }
             level.removeBlock(pos, false);
         } else if (state.is(BlockTags.REPLACEABLE_PLANTS)) {
-            pyrotechnics$charGrass(level, pos, Blocks.GRASS_BLOCK);
+            pyrotechnics$charGrass(level, pos);
             pyrotechnics$setNeighbourFire(level, pos);
         } else {
             level.removeBlock(pos, false);
@@ -51,13 +52,13 @@ public class FireBlockMixin {
         } else if (state.is(BlockTags.LEAVES)) {
             if (randomSource.nextFloat() < 0.3) {
                 pyrotechnics$setNeighbourFire(level, pos);
-                if (level.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK)) {
+                if (level.getBlockState(pos.below()).is(ModBlockTags.CHARRABLE_GRASS)) {
                     level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
                 }
             }
             level.removeBlock(pos, false);
         } else if (state.is(BlockTags.REPLACEABLE_PLANTS)) {
-            pyrotechnics$charGrass(level, pos, Blocks.DIRT);
+            pyrotechnics$charGrass(level, pos);
             pyrotechnics$setNeighbourFire(level, pos);
         } else {
             level.setBlock(pos, state, 3);
@@ -95,16 +96,16 @@ public class FireBlockMixin {
     }
 
     @Unique
-    private static void pyrotechnics$charGrass(Level level, BlockPos pos, Block grassBlock) {
+    private static void pyrotechnics$charGrass(Level level, BlockPos pos) {
         if (level.getBlockState(pos).is(Blocks.GRASS)) {
-            level.setBlock(pos, ModBlocks.BURNT_GRASS.get().defaultBlockState(), 3);
-            if (level.getBlockState(pos.below()).is(grassBlock)) {
+            level.setBlockAndUpdate(pos, ModBlocks.BURNT_GRASS.get().defaultBlockState());
+            if (level.getBlockState(pos.below()).is(ModBlockTags.CHARRABLE_GRASS)) {
                 level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
 
             }
         } else {
             level.setBlock(pos, ModBlocks.BURNT_PLANT.get().defaultBlockState(), 3);
-            if (level.getBlockState(pos.below()).is(Blocks.GRASS_BLOCK)) {
+            if (level.getBlockState(pos.below()).is(ModBlockTags.CHARRABLE_GRASS)) {
                 level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
             }
         }
