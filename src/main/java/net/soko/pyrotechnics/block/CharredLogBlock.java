@@ -23,6 +23,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.soko.pyrotechnics.capability.fieriness.FierinessManager;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class CharredLogBlock extends RotatedPillarBlock {
@@ -36,12 +38,14 @@ public class CharredLogBlock extends RotatedPillarBlock {
     }
 
     @Override
-    public void playerDestroy(Level pLevel, Player pPlayer, BlockPos pPos, BlockState pState, @Nullable BlockEntity pBlockEntity, ItemStack pTool) {
-        if (pState.getValue(SMOLDERING) && pLevel instanceof ServerLevel) {
+    public void playerDestroy(@NotNull Level level, @NotNull Player player, @NotNull BlockPos blockPos, BlockState pState, @Nullable BlockEntity pBlockEntity, @NotNull ItemStack itemStack) {
+        if (pState.getValue(SMOLDERING) && level instanceof ServerLevel) {
             // lava particle if smoldering
-            ((ServerLevel) pLevel).sendParticles(ParticleTypes.LAVA, pPos.getX() + 0.5, pPos.getY() + 0.5, pPos.getZ() + 0.5, 10, 0.5, 0.5, 0.5, 0.1);
+            ((ServerLevel) level).sendParticles(ParticleTypes.LAVA, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, 10, 0.5, 0.5, 0.5, 0.1);
+            if (FierinessManager.get(level).getFierinessIncrement(blockPos) > 0)
+                FierinessManager.get(level).decreaseFieriness(blockPos, 1);
         }
-        super.playerDestroy(pLevel, pPlayer, pPos, pState, pBlockEntity, pTool);
+        super.playerDestroy(level, player, blockPos, pState, pBlockEntity, itemStack);
     }
 
     @Override
@@ -60,10 +64,14 @@ public class CharredLogBlock extends RotatedPillarBlock {
                     // do nothing to keep the top block smoldering for longer, making more particles spawn
                 } else {
                     pLevel.setBlock(pPos, pState.setValue(SMOLDERING, false).setValue(LIT, false), Block.UPDATE_ALL);
+                    if (FierinessManager.get(pLevel).getFierinessIncrement(pPos) > 0)
+                        FierinessManager.get(pLevel).decreaseFieriness(pPos, 1);
                 }
             }
         } else {
             pLevel.setBlock(pPos, pState.setValue(SMOLDERING, false), Block.UPDATE_ALL);
+            if (FierinessManager.get(pLevel).getFierinessIncrement(pPos) > 0)
+                FierinessManager.get(pLevel).decreaseFieriness(pPos, 1);
         }
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
         for (Direction direction : Direction.values()) {

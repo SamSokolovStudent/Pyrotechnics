@@ -3,12 +3,12 @@ package net.soko.pyrotechnics.block.entity;
 import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.soko.pyrotechnics.block.CharredGrassBlock;
 import net.soko.pyrotechnics.block.ModBlockTags;
 import net.soko.pyrotechnics.block.ModBlocks;
+import net.soko.pyrotechnics.capability.fieriness.FierinessManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -51,6 +51,7 @@ public class CharredGrassBlockEntity extends BlockEntity {
                     BlockPos possiblePosition = possiblePositions.remove(pLevel.random.nextInt(possiblePositions.size()));
                     pLevel.setBlockAndUpdate(possiblePosition, ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true));
                     tempPositions.add(possiblePosition);
+                    FierinessManager.get(pLevel).increaseFieriness(possiblePosition, 1);
                 }
             }
         }

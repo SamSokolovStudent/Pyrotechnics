@@ -17,6 +17,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -66,6 +67,7 @@ public class TunnelBombBlock extends FaceAttachedHorizontalDirectionalBlock {
                         playerHeldItem.shrink(1);
                     }
                 }
+                pLevel.setBlockAndUpdate(pPos, Blocks.AIR.defaultBlockState());
                 explode(pLevel, pPos);
                 pLevel.playSound(null, pPos, SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0f, 1.0f);
                 Item item = playerHeldItem.getItem();

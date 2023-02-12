@@ -1,6 +1,7 @@
 package net.soko.pyrotechnics.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -29,10 +30,13 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.Tags;
-import net.minecraftforge.fml.common.Mod;
 import net.soko.pyrotechnics.block.entity.CharredGrassBlockEntity;
+import net.soko.pyrotechnics.capability.fieriness.FierinessManager;
 import net.soko.pyrotechnics.item.ModItems;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CharredGrassBlock extends BaseEntityBlock {
     public static final BooleanProperty SMOLDERING = BooleanProperty.create("smoldering");
@@ -45,47 +49,77 @@ public class CharredGrassBlock extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        BlockPos above = pPos.above();
-        if (pLevel.isEmptyBlock(above)) {
-            ItemStack playerHeldItem = pPlayer.getItemInHand(pHand);
-            if (playerHeldItem.is(Tags.Items.TOOLS_SHOVELS)) {
-                if (!pPlayer.isCreative()) {
-                    playerHeldItem.hurtAndBreak(1, pPlayer, (player) -> player.broadcastBreakEvent(pHand));
+    public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player pPlayer, InteractionHand interactionHand, BlockHitResult hitResult) {
+        ItemStack playerHeldItem = pPlayer.getItemInHand(interactionHand);
+        if (playerHeldItem.is(Tags.Items.TOOLS_SHOVELS)) {
+            if (!pPlayer.isCreative()) {
+                playerHeldItem.hurtAndBreak(1, pPlayer, (player) -> player.broadcastBreakEvent(interactionHand));
+            }
+            List<BlockPos> blocksToReplace = affectedArea(playerHeldItem.getItem(), blockPos, pPlayer);
+            level.playSound(null, blockPos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0f, 0.8f);
+            for (BlockPos replacePos : blocksToReplace) {
+                if (!level.getBlockState(replacePos).is(ModBlocks.CHARRED_GRASS_BLOCK.get())) {
+                    continue;
                 }
-                pLevel.setBlock(pPos, Blocks.DIRT.defaultBlockState(), 3);
-                pLevel.playSound(null, pPos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0f, 0.8f);
-                if (pLevel.random.nextFloat() > 0.7f) {
-                    double d0 = (double) (pLevel.random.nextFloat() * 0.7F) + (double) 0.15F;
-                    double d1 = (double) (pLevel.random.nextFloat() * 0.7F) + (double) 0.060000002F + 0.6D;
-                    double d2 = (double) (pLevel.random.nextFloat() * 0.7F) + (double) 0.15F;
-                    ItemEntity itementity = new ItemEntity(pLevel, (double) pPos.getX() + d0, (double) pPos.getY() + d1, (double) pPos.getZ() + d2, new ItemStack(ModItems.ASH.get()));
+                level.setBlockAndUpdate(replacePos, Blocks.DIRT.defaultBlockState());
+                BlockPos aboveReplace = replacePos.above();
+                if (level.getBlockState(aboveReplace).is(ModBlocks.BURNT_GRASS.get()) || level.getBlockState(aboveReplace).is(ModBlocks.BURNT_PLANT.get())) {
+                    level.setBlockAndUpdate(aboveReplace, Blocks.AIR.defaultBlockState());
+                }
+                if (level.random.nextFloat() > 0.7f) {
+                    double d0 = (double) (level.random.nextFloat() * 0.7F) + (double) 0.15F;
+                    double d1 = (double) (level.random.nextFloat() * 0.7F) + (double) 0.060000002F + 0.6D;
+                    double d2 = (double) (level.random.nextFloat() * 0.7F) + (double) 0.15F;
+                    ItemEntity itementity = new ItemEntity(level, (double) blockPos.getX() + d0, (double) blockPos.getY() + d1, (double) blockPos.getZ() + d2, new ItemStack(ModItems.ASH.get()));
                     itementity.setDefaultPickUpDelay();
-                    pLevel.addFreshEntity(itementity);
+                    level.addFreshEntity(itementity);
                     Item item = playerHeldItem.getItem();
                     pPlayer.awardStat(Stats.ITEM_USED.get(item));
-                    return InteractionResult.SUCCESS;
-                } else {
-                    return InteractionResult.SUCCESS;
                 }
-            } else if (playerHeldItem.is(Items.FLINT_AND_STEEL) || playerHeldItem.is(Items.FIRE_CHARGE)) {
-                if (!pPlayer.isCreative()) {
-                    if (playerHeldItem.is(Items.FLINT_AND_STEEL)) {
-                        playerHeldItem.hurtAndBreak(1, pPlayer, (player) -> player.broadcastBreakEvent(pHand));
-                    } else {
-                        playerHeldItem.shrink(1);
-                    }
-                }
-                pLevel.setBlockAndUpdate(pPos, pState.setValue(SMOLDERING, true));
-                pLevel.playSound(null, pPos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0f, 0.8f);
-                Item item = playerHeldItem.getItem();
-                pPlayer.awardStat(Stats.ITEM_USED.get(item));
-                return InteractionResult.SUCCESS;
-            } else {
-                return InteractionResult.PASS;
             }
+            return InteractionResult.SUCCESS;
         }
-        return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+        return super.use(blockState, level, blockPos, pPlayer, interactionHand, hitResult);
+    }
+
+
+    public List<BlockPos> affectedArea(Item item, BlockPos pos, Player player) {
+        List<BlockPos> blockPosList = new ArrayList<>();
+        /*
+        Wood/Default: Affect 1 block
+        Stone: Affect 3 blocks in a straight line
+        Iron: Affect 5 blocks in a straight line
+        Gold/Diamond: Affect 3x3 area (9 corresponding blocks) in front of player
+        Netherite: Affect 6*3 area (18 corresponding blocks)
+         */
+        Direction direction = player.getDirection();
+        if (item.equals(Items.STONE_SHOVEL)) {
+            for (int i = 0; i <= 3; i++) {
+                blockPosList.add(pos.relative(direction, i));
+            }
+        } else if (item.equals(Items.IRON_SHOVEL)) {
+            for (int i = 0; i <= 5; i++) {
+                blockPosList.add(pos.relative(direction, i));
+            }
+        } else if (item.equals(Items.GOLDEN_SHOVEL) || item.equals(Items.DIAMOND_SHOVEL)) {
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    blockPosList.add(pos.relative(direction, 1).offset(i, 0, j));
+                }
+            }
+        } else if (item.equals(Items.NETHERITE_SHOVEL)) {
+            for (int i = -2; i <= 2; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    if (direction == Direction.NORTH || direction == Direction.SOUTH)
+                        blockPosList.add(pos.relative(direction, 2).offset(j, 0, i));
+                    else if (direction == Direction.EAST || direction == Direction.WEST)
+                        blockPosList.add(pos.relative(direction, 2).offset(i, 0, j));
+                }
+            }
+        } else {
+            blockPosList.add(pos);
+        }
+        return blockPosList;
     }
 
 
@@ -106,9 +140,11 @@ public class CharredGrassBlock extends BaseEntityBlock {
             } else if (pLevel.getBlockState(pPos.above()).is(Blocks.FERN) || pLevel.getBlockState(pPos.above()).is(BlockTags.FLOWERS)) {
                 pLevel.setBlockAndUpdate(pPos.above(), ModBlocks.BURNT_PLANT.get().defaultBlockState());
             }
-            }
+        }
         if (pRandom.nextInt(7) > 1) {
             pLevel.setBlockAndUpdate(pPos, pState.setValue(SMOLDERING, false).setValue(LIT, false));
+            if (FierinessManager.get(pLevel).getFierinessIncrement(pPos) > 0)
+                FierinessManager.get(pLevel).decreaseFieriness(pPos, 1);
         }
         super.randomTick(pState, pLevel, pPos, pRandom);
     }

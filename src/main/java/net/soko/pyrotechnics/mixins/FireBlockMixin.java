@@ -11,6 +11,8 @@ import net.soko.pyrotechnics.block.CharredGrassBlock;
 import net.soko.pyrotechnics.block.CharredLogBlock;
 import net.soko.pyrotechnics.block.ModBlockTags;
 import net.soko.pyrotechnics.block.ModBlocks;
+import net.soko.pyrotechnics.capability.fieriness.FierinessManager;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,13 +23,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class FireBlockMixin {
 
     @Inject(method = "tryCatchFire", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;removeBlock(Lnet/minecraft/core/BlockPos;Z)Z"), cancellable = true)
-    public void pyrotechnics$removeBlock(Level level, BlockPos pos, int humidity, RandomSource randomSource, int age, Direction face, CallbackInfo ci) {
+    public void pyrotechnics$removeBlock(@NotNull Level level, BlockPos pos, int humidity, RandomSource randomSource, int age, Direction face, CallbackInfo ci) {
         BlockState state = level.getBlockState(pos);
         if (state.is(BlockTags.LOGS_THAT_BURN)) {
             pyrotechnics$charBlock(level, pos, state);
         } else if (state.is(BlockTags.LEAVES)) {
             if (randomSource.nextFloat() < 0.3) {
                 pyrotechnics$setNeighbourFire(level, pos);
+                FierinessManager.get(level).increaseFieriness(pos, 2);
                 if (level.getBlockState(pos.below()).is(ModBlockTags.CHARRABLE_GRASS)) {
                     level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
                 }
@@ -45,12 +48,12 @@ public class FireBlockMixin {
 
 
     @Inject(method = "tryCatchFire", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"), cancellable = true)
-    public void pyrotechnics$setBlock(Level level, BlockPos pos, int humidity, RandomSource randomSource, int age, Direction face, CallbackInfo ci) {
+    public void pyrotechnics$setBlock(@NotNull Level level, BlockPos pos, int humidity, RandomSource randomSource, int age, Direction face, CallbackInfo ci) {
         BlockState state = level.getBlockState(pos);
         if (state.is(BlockTags.LOGS_THAT_BURN)) {
             pyrotechnics$charBlock(level, pos, state);
         } else if (state.is(BlockTags.LEAVES)) {
-            if (randomSource.nextFloat() < 0.3) {
+            if (randomSource.nextFloat() < 0.25) {
                 pyrotechnics$setNeighbourFire(level, pos);
                 if (level.getBlockState(pos.below()).is(ModBlockTags.CHARRABLE_GRASS)) {
                     level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
@@ -75,6 +78,7 @@ public class FireBlockMixin {
         } else {
             level.setBlockAndUpdate(pos, ModBlocks.CHARRED_LOG.get().defaultBlockState().setValue(CharredLogBlock.SMOLDERING, true).setValue(CharredLogBlock.LIT, true));
         }
+        FierinessManager.get(level).increaseFieriness(pos, 30);
         pyrotechnics$setNeighbourFire(level, pos);
     }
 
@@ -88,7 +92,7 @@ public class FireBlockMixin {
                 for (Direction neighbourDirection : Direction.values()) {
                     BlockPos neighbourNeighbourPos = mutablePos.setWithOffset(neighbourPos, neighbourDirection);
                     if (BaseFireBlock.canBePlacedAt(level, neighbourNeighbourPos, neighbourDirection.getOpposite())) {
-                        level.setBlock(neighbourNeighbourPos, BaseFireBlock.getState(level, neighbourNeighbourPos), 3);
+                        level.setBlockAndUpdate(neighbourNeighbourPos, BaseFireBlock.getState(level, neighbourNeighbourPos));
                     }
                 }
             }
@@ -101,7 +105,6 @@ public class FireBlockMixin {
             level.setBlockAndUpdate(pos, ModBlocks.BURNT_GRASS.get().defaultBlockState());
             if (level.getBlockState(pos.below()).is(ModBlockTags.CHARRABLE_GRASS)) {
                 level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
-
             }
         } else {
             level.setBlock(pos, ModBlocks.BURNT_PLANT.get().defaultBlockState(), 3);
@@ -109,6 +112,8 @@ public class FireBlockMixin {
                 level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
             }
         }
+        FierinessManager.get(level).increaseFieriness(pos, 4);
+
     }
 }
 

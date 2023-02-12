@@ -7,14 +7,15 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.soko.pyrotechnics.data.advancements.ModCriteria;
 import net.soko.pyrotechnics.block.ModBlocks;
+import net.soko.pyrotechnics.capability.fieriness.FierinessEvents;
+import net.soko.pyrotechnics.data.advancements.ModCriteria;
 import net.soko.pyrotechnics.data.loot.ModLootConditions;
-import net.soko.pyrotechnics.event.ClientEvents;
 import net.soko.pyrotechnics.entity.ModEntities;
 import net.soko.pyrotechnics.event.CommonEvents;
 import net.soko.pyrotechnics.item.ModCreativeModeTab;
 import net.soko.pyrotechnics.item.ModItems;
+import net.soko.pyrotechnics.networking.ModMessages;
 import net.soko.pyrotechnics.particle.ModParticles;
 import net.soko.pyrotechnics.recipe.ModRecipes;
 import org.slf4j.Logger;
@@ -51,14 +52,16 @@ public class PyroTechnics {
         MinecraftForge.EVENT_BUS.addListener(CommonEvents::onEntityDeath);
         MinecraftForge.EVENT_BUS.addListener(CommonEvents::onEntityDrops);
         MinecraftForge.EVENT_BUS.addListener(CommonEvents::onItemRightClick);
+        MinecraftForge.EVENT_BUS.addListener(FierinessEvents::onWorldTick);
 
-        if(FMLEnvironment.dist.isClient()) {
-            modEventBus.register(ClientEvents.class);
+        if (FMLEnvironment.dist.isClient()) {
+            PyrotechnicsClient.init();
         }
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         ModCriteria.init();
+        ModMessages.register();
     }
 
 }
