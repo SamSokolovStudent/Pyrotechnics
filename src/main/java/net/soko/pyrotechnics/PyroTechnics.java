@@ -55,7 +55,7 @@ public class PyroTechnics {
         MinecraftForge.EVENT_BUS.addListener(FierinessEvents::onWorldTick);
 
         if (FMLEnvironment.dist.isClient()) {
-            PyrotechnicsClient.init();
+            PyroTechnicsClient.init();
         }
     }
 

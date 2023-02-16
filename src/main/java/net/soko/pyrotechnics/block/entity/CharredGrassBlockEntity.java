@@ -51,7 +51,7 @@ public class CharredGrassBlockEntity extends BlockEntity {
                     BlockPos possiblePosition = possiblePositions.remove(pLevel.random.nextInt(possiblePositions.size()));
                     pLevel.setBlockAndUpdate(possiblePosition, ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true));
                     tempPositions.add(possiblePosition);
-                    FierinessManager.get(pLevel).increaseFieriness(possiblePosition, 1);
+                    FierinessManager.get(pLevel).increaseFieriness(possiblePosition, 4);
                 }
             }
         }

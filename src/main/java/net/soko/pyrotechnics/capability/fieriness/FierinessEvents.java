@@ -1,5 +1,6 @@
 package net.soko.pyrotechnics.capability.fieriness;
 
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
 
 public class FierinessEvents {

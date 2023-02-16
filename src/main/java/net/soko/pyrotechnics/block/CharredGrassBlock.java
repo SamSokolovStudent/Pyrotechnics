@@ -143,8 +143,6 @@ public class CharredGrassBlock extends BaseEntityBlock {
         }
         if (pRandom.nextInt(7) > 1) {
             pLevel.setBlockAndUpdate(pPos, pState.setValue(SMOLDERING, false).setValue(LIT, false));
-            if (FierinessManager.get(pLevel).getFierinessIncrement(pPos) > 0)
-                FierinessManager.get(pLevel).decreaseFieriness(pPos, 1);
         }
         super.randomTick(pState, pLevel, pPos, pRandom);
     }

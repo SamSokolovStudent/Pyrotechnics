@@ -1,21 +1,27 @@
 package net.soko.pyrotechnics.capability.fieriness;
 
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.world.level.ChunkPos;
+import net.minecraft.util.Mth;
 
 public class ClientFierinessData {
-    private static Object2IntMap<ChunkPos> fierinessMap = new Object2IntOpenHashMap<>();
-    private static Object2IntMap<ChunkPos> clientFierinessMap = new Object2IntOpenHashMap<>();
+    private static float targetFieriness;
+    private static float currentFieriness;
+    private static final float MAX_FIERINESS = 100;
 
-    public static void setChunkFieriness(int fieriness, ChunkPos chunkPos) {
-        fierinessMap.put(chunkPos, fieriness);
+
+    public static void setFieriness(float fieriness) {
+        targetFieriness = fieriness;
     }
 
-    public static int getChunkFieriness(ChunkPos chunkPos) {
-        return fierinessMap.getInt(chunkPos);
+    public static void update() {
+        currentFieriness = Mth.lerp(0.01f, currentFieriness, targetFieriness);
     }
 
-    public void blurFieriness() {
+    public static float getFierinessPercentage() {
+        return Math.min(currentFieriness / MAX_FIERINESS, 1);
     }
+
+    public static float updateWithPartial(float partialTick) {
+        return Mth.lerp(partialTick, currentFieriness, targetFieriness);
+    }
+
 }

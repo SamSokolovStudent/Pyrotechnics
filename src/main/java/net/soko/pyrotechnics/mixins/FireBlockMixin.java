@@ -28,9 +28,9 @@ public class FireBlockMixin {
         if (state.is(BlockTags.LOGS_THAT_BURN)) {
             pyrotechnics$charBlock(level, pos, state);
         } else if (state.is(BlockTags.LEAVES)) {
-            if (randomSource.nextFloat() < 0.3) {
+            if (randomSource.nextFloat() < 0.25) {
                 pyrotechnics$setNeighbourFire(level, pos);
-                FierinessManager.get(level).increaseFieriness(pos, 2);
+                FierinessManager.get(level).increaseFieriness(pos, 4);
                 if (level.getBlockState(pos.below()).is(ModBlockTags.CHARRABLE_GRASS)) {
                     level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
                 }
@@ -55,6 +55,7 @@ public class FireBlockMixin {
         } else if (state.is(BlockTags.LEAVES)) {
             if (randomSource.nextFloat() < 0.25) {
                 pyrotechnics$setNeighbourFire(level, pos);
+                FierinessManager.get(level).increaseFieriness(pos, 4);
                 if (level.getBlockState(pos.below()).is(ModBlockTags.CHARRABLE_GRASS)) {
                     level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
                 }
@@ -78,7 +79,7 @@ public class FireBlockMixin {
         } else {
             level.setBlockAndUpdate(pos, ModBlocks.CHARRED_LOG.get().defaultBlockState().setValue(CharredLogBlock.SMOLDERING, true).setValue(CharredLogBlock.LIT, true));
         }
-        FierinessManager.get(level).increaseFieriness(pos, 30);
+        FierinessManager.get(level).increaseFieriness(pos, 50);
         pyrotechnics$setNeighbourFire(level, pos);
     }
 
@@ -112,7 +113,7 @@ public class FireBlockMixin {
                 level.setBlockAndUpdate(pos.below(), ModBlocks.CHARRED_GRASS_BLOCK.get().defaultBlockState().setValue(CharredGrassBlock.SMOLDERING, true).setValue(CharredGrassBlock.IS_SOURCE, true).setValue(CharredGrassBlock.LIT, true));
             }
         }
-        FierinessManager.get(level).increaseFieriness(pos, 4);
+        FierinessManager.get(level).increaseFieriness(pos, 12);
 
     }
 }

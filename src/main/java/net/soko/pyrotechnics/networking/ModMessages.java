@@ -31,7 +31,7 @@ public class ModMessages {
         net.messageBuilder(PacketSyncFierinessS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(PacketSyncFierinessS2C::new)
                 .encoder(PacketSyncFierinessS2C::toBytes)
-                .consumer(PacketSyncFierinessS2C::handle)
+                .consumerMainThread(PacketSyncFierinessS2C::handle)
                 .add();
     }
 
